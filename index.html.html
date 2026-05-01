@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum Panini — Mundial 2026</title>
+<meta name="description" content="Lleva el registro de tus láminas del álbum Panini Copa Mundial FIFA 2026">
+<style>
+  :root {
+    --verde: #1D9E75;
+    --verde-bg: #E1F5EE;
+    --verde-borde: #5DCAA5;
+    --azul: #378ADD;
+    --azul-bg: #E6F1FB;
+    --azul-borde: #85B7EB;
+    --rojo: #D85A30;
+    --gris-bg: #f5f5f3;
+    --gris-card: #ffffff;
+    --gris-borde: rgba(0,0,0,0.1);
+    --gris-borde2: rgba(0,0,0,0.18);
+    --texto: #1a1a1a;
+    --texto2: #666;
+    --texto3: #999;
+    --radio: 12px;
+    --radio-sm: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --gris-bg: #111110;
+      --gris-card: #1c1c1a;
+      --gris-borde: rgba(255,255,255,0.1);
+      --gris-borde2: rgba(255,255,255,0.18);
+      --texto: #f0f0ee;
+      --texto2: #aaa;
+      --texto3: #666;
+      --verde-bg: #0a3326;
+      --verde-borde: #1D9E75;
+      --azul-bg: #0a1f38;
+      --azul-borde: #378ADD;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gris-bg); color: var(--texto); min-height: 100vh; }
+
+  .topbar { background: var(--gris-card); border-bottom: 0.5px solid var(--gris-borde); position: sticky; top: 0; z-index: 100; }
+  .topbar-inner { max-width: 680px; margin: 0 auto; padding: 14px 16px 12px; }
+  .topbar h1 { font-size: 18px; font-weight: 600; color: var(--texto); }
+  .topbar p { font-size: 12px; color: var(--texto2); margin-top: 2px; }
+
+  .main { max-width: 680px; margin: 0 auto; padding: 0 12px 80px; }
+
+  .stats-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 14px 0 8px; }
+  .stat { background: var(--gris-card); border-radius: var(--radio-sm); padding: 10px 8px; text-align: center; border: 0.5px solid var(--gris-borde); }
+  .stat-num { font-size: 20px; font-weight: 600; }
+  .stat-lbl { font-size: 11px; color: var(--texto2); margin-top: 2px; }
+  .num-tengo { color: var(--verde); }
+  .num-faltan { color: var(--rojo); }
+  .num-repet { color: var(--azul); }
+
+  .progress-global { background: var(--gris-card); border-radius: var(--radio-sm); padding: 12px 14px; margin-bottom: 10px; border: 0.5px solid var(--gris-borde); }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--texto2); margin-bottom: 6px; }
+  .progress-track { height: 6px; background: var(--gris-bg); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--verde); border-radius: 3px; transition: width 0.4s; }
+
+  .controls { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .search-wrap { flex: 1; min-width: 160px; position: relative; }
+  .search-wrap input { width: 100%; padding: 8px 12px 8px 32px; border-radius: var(--radio-sm); border: 0.5px solid var(--gris-borde2); background: var(--gris-card); color: var(--texto); font-size: 14px; outline: none; }
+  .search-wrap input:focus { border-color: var(--verde); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--texto3); font-size: 14px; pointer-events: none; }
+  .filters { display: flex; gap: 4px; flex-wrap: wrap; }
+  .fbtn { font-size: 12px; padding: 7px 12px; border: 0.5px solid var(--gris-borde2); border-radius: var(--radio-sm); background: var(--gris-card); color: var(--texto2); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .fbtn.active { background: var(--texto); color: var(--gris-card); border-color: var(--texto); }
+
+  .legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--texto2); }
+  .ldot { width: 14px; height: 14px; border-radius: 3px; border: 0.5px solid; flex-shrink: 0; }
+  .ldot-f { background: var(--gris-bg); border-color: var(--gris-borde2); }
+  .ldot-t { background: var(--verde-bg); border-color: var(--verde-borde); }
+  .ldot-r { background: var(--azul-bg); border-color: var(--azul-borde); }
+
+  .grupo-section { margin-bottom: 10px; }
+  .grupo-titulo { font-size: 11px; font-weight: 600; color: var(--texto3); text-transform: uppercase; letter-spacing: 0.07em; padding: 8px 0 6px; border-bottom: 0.5px solid var(--gris-borde); margin-bottom: 6px; }
+
+  .sel-card { background: var(--gris-card); border: 0.5px solid var(--gris-borde); border-radius: var(--radio); margin-bottom: 6px; overflow: hidden; transition: border-color 0.2s; }
+  .sel-card.completa { border-color: var(--verde-borde); }
+  .sel-header { display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .flag { font-size: 22px; line-height: 1; flex-shrink: 0; }
+  .sel-info { flex: 1; min-width: 0; }
+  .sel-name { font-size: 14px; font-weight: 500; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sel-sub { font-size: 12px; color: var(--texto2); margin-top: 1px; }
+  .sel-pct { font-size: 13px; font-weight: 600; color: var(--verde); margin-right: 4px; flex-shrink: 0; }
+  .chevron { font-size: 11px; color: var(--texto3); transition: transform 0.2s; flex-shrink: 0; }
+  .chevron.open { transform: rotate(180deg); }
+  .mini-bar { height: 3px; background: var(--gris-bg); margin: 0 12px 8px; border-radius: 2px; overflow: hidden; }
+  .mini-fill { height: 100%; background: var(--verde); border-radius: 2px; transition: width 0.3s; }
+
+  .stickers-panel { padding: 10px 12px 12px; border-top: 0.5px solid var(--gris-borde); display: none; }
+  .stickers-panel.open { display: block; }
+  .stickers-actions { display: flex; gap: 6px; margin-bottom: 10px; }
+  .sbtn { font-size: 11px; padding: 5px 10px; border-radius: 6px; border: 0.5px solid var(--gris-borde2); background: transparent; color: var(--texto2); cursor: pointer; }
+  .sbtn:hover { background: var(--gris-bg); }
+  .stickers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 5px; }
+  .sticker { aspect-ratio: 1; border-radius: 6px; border: 0.5px solid var(--gris-borde2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; cursor: pointer; transition: transform 0.1s, background 0.15s; color: var(--texto2); background: var(--gris-bg); user-select: none; -webkit-tap-highlight-color: transparent; }
+  .sticker:active { transform: scale(0.9); }
+  .sticker.t { background: var(--verde-bg); border-color: var(--verde-borde); color: #0F6E56; }
+  .sticker.r { background: var(--azul-bg); border-color: var(--azul-borde); color: #185FA5; }
+
+  .fab { position: fixed; bottom: 20px; right: 16px; background: var(--texto); color: var(--gris-card); border: none; border-radius: 50px; padding: 12px 20px; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); z-index: 200; display: flex; align-items: center; gap: 8px; }
+
+  .toast { position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--texto); color: var(--gris-card); padding: 10px 18px; border-radius: 50px; font-size: 13px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 300; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--texto3); font-size: 14px; }
+
+  @media (max-width: 420px) {
+    .stats-bar { grid-template-columns: repeat(2,1fr); }
+    .stat-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <h1>⚽ Álbum Panini — Mundial 2026</h1>
+    <p>Toca cada lámina: 1 vez = tengo · 2 veces = repetida · 3 veces = falta</p>
+  </div>
+</div>
+
+<div class="main">
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num" id="s-total">980</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-num num-tengo" id="s-tengo">0</div><div class="stat-lbl">Tengo</div></div>
+    <div class="stat"><div class="stat-num num-faltan" id="s-faltan">980</div><div class="stat-lbl">Faltan</div></div>
+    <div class="stat"><div class="stat-num num-repet" id="s-repet">0</div><div class="stat-lbl">Repetidas</div></div>
+  </div>
+
+  <div class="progress-global">
+    <div class="progress-label">
+      <span>Progreso general</span>
+      <span id="s-pct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="g-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Buscar selección o grupo..." oninput="filtrar()">
+    </div>
+    <div class="filters">
+      <button class="fbtn active" onclick="setFiltro('todas',this)">Todas</button>
+      <button class="fbtn" onclick="setFiltro('faltan',this)">Me faltan</button>
+      <button class="fbtn" onclick="setFiltro('repetidas',this)">Repetidas</button>
+      <button class="fbtn" onclick="setFiltro('completas',this)">Completas</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="ldot ldot-f"></div>Falta</div>
+    <div class="legend-item"><div class="ldot ldot-t"></div>La tengo</div>
+    <div class="legend-item"><div class="ldot ldot-r"></div>Repetida</div>
+  </div>
+
+  <div id="contenedor"></div>
+  <div class="empty" id="empty" style="display:none">No se encontraron resultados</div>
+</div>
+
+<button class="fab" onclick="exportar()">📋 Exportar faltantes</button>
+<div class="toast" id="toast"></div>
+
+<script>
+const ALBUM = [
+  {id:"INT", name:"Introducción / Copa",    flag:"🏆", n:16, grupo:"Introducción"},
+  {id:"STA", name:"Estadios y sedes",        flag:"🏟", n:16, grupo:"Introducción"},
+
+  {id:"MEX", name:"México",                  flag:"🇲🇽", n:20, grupo:"Grupo A"},
+  {id:"RSA", name:"Sudáfrica",               flag:"🇿🇦", n:20, grupo:"Grupo A"},
+  {id:"KOR", name:"Corea del Sur",           flag:"🇰🇷", n:20, grupo:"Grupo A"},
+  {id:"CZE", name:"Rep. Checa",              flag:"🇨🇿", n:20, grupo:"Grupo A"},
+
+  {id:"CAN", name:"Canadá",                  flag:"🇨🇦", n:20, grupo:"Grupo B"},
+  {id:"BIH", name:"Bosnia y Herzegovina",    flag:"🇧🇦", n:20, grupo:"Grupo B"},
+  {id:"QAT", name:"Qatar",                   flag:"🇶🇦", n:20, grupo:"Grupo B"},
+  {id:"SUI", name:"Suiza",                   flag:"🇨🇭", n:20, grupo:"Grupo B"},
+
+  {id:"BRA", name:"Brasil",                  flag:"🇧🇷", n:20, grupo:"Grupo C"},
+  {id:"MAR", name:"Marruecos",               flag:"🇲🇦", n:20, grupo:"Grupo C"},
+  {id:"HAI", name:"Haití",                   flag:"🇭🇹", n:20, grupo:"Grupo C"},
+  {id:"SCO", name:"Escocia",                 flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿", n:20, grupo:"Grupo C"},
+
+  {id:"USA", name:"Estados Unidos",          flag:"🇺🇸", n:20, grupo:"Grupo D"},
+  {id:"PAR", name:"Paraguay",                flag:"🇵🇾", n:20, grupo:"Grupo D"},
+  {id:"AUS", name:"Australia",               flag:"🇦🇺", n:20, grupo:"Grupo D"},
+  {id:"TUR", name:"Turquía",                 flag:"🇹🇷", n:20, grupo:"Grupo D"},
+
+  {id:"GER", name:"Alemania",                flag:"🇩🇪", n:20, grupo:"Grupo E"},
+  {id:"CUW", name:"Curazao",                 flag:"🇨🇼", n:20, grupo:"Grupo E"},
+  {id:"CIV", name:"Costa de Marfil",         flag:"🇨🇮", n:20, grupo:"Grupo E"},
+  {id:"ECU", name:"Ecuador",                 flag:"🇪🇨", n:20, grupo:"Grupo E"},
+
+  {id:"NED", name:"Países Bajos",            flag:"🇳🇱", n:20, grupo:"Grupo F"},
+  {id:"JPN", name:"Japón",                   flag:"🇯🇵", n:20, grupo:"Grupo F"},
+  {id:"SWE", name:"Suecia",                  flag:"🇸🇪", n:20, grupo:"Grupo F"},
+  {id:"TUN", name:"Túnez",                   flag:"🇹🇳", n:20, grupo:"Grupo F"},
+
+  {id:"BEL", name:"Bélgica",                 flag:"🇧🇪", n:20, grupo:"Grupo G"},
+  {id:"EGY", name:"Egipto",                  flag:"🇪🇬", n:20, grupo:"Grupo G"},
+  {id:"IRN", name:"Irán",                    flag:"🇮🇷", n:20, grupo:"Grupo G"},
+  {id:"NZL", name:"Nueva Zelanda",           flag:"🇳🇿", n:20, grupo:"Grupo G"},
+
+  {id:"ESP", name:"España",                  flag:"🇪🇸", n:20, grupo:"Grupo H"},
+  {id:"CPV", name:"Cabo Verde",              flag:"🇨🇻", n:20, grupo:"Grupo H"},
+  {id:"KSA", name:"Arabia Saudita",          flag:"🇸🇦", n:20, grupo:"Grupo H"},
+  {id:"URU", name:"Uruguay",                 flag:"🇺🇾", n:20, grupo:"Grupo H"},
+
+  {id:"FRA", name:"Francia",                 flag:"🇫🇷", n:20, grupo:"Grupo I"},
+  {id:"SEN", name:"Senegal",                 flag:"🇸🇳", n:20, grupo:"Grupo I"},
+  {id:"IRQ", name:"Irak",                    flag:"🇮🇶", n:20, grupo:"Grupo I"},
+  {id:"NOR", name:"Noruega",                 flag:"🇳🇴", n:20, grupo:"Grupo I"},
+
+  {id:"ARG", name:"Argentina",               flag:"🇦🇷", n:20, grupo:"Grupo J"},
+  {id:"ALG", name:"Argelia",                 flag:"🇩🇿", n:20, grupo:"Grupo J"},
+  {id:"AUT", name:"Austria",                 flag:"🇦🇹", n:20, grupo:"Grupo J"},
+  {id:"JOR", name:"Jordania",                flag:"🇯🇴", n:20, grupo:"Grupo J"},
+
+  {id:"POR", name:"Portugal",                flag:"🇵🇹", n:20, grupo:"Grupo K"},
+  {id:"UZB", name:"Uzbekistán",              flag:"🇺🇿", n:20, grupo:"Grupo K"},
+  {id:"COL", name:"Colombia",                flag:"🇨🇴", n:20, grupo:"Grupo K"},
+  {id:"COD", name:"R.D. Congo",              flag:"🇨🇩", n:20, grupo:"Grupo K"},
+
+  {id:"ENG", name:"Inglaterra",              flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", n:20, grupo:"Grupo L"},
+  {id:"CRO", name:"Croacia",                 flag:"🇭🇷", n:20, grupo:"Grupo L"},
+  {id:"GHA", name:"Ghana",                   flag:"🇬🇭", n:20, grupo:"Grupo L"},
+  {id:"PAN", name:"Panamá",                  flag:"🇵🇦", n:20, grupo:"Grupo L"},
+];
+
+let state = {};
+let openCards = {};
+let filtro = 'todas';
+
+try { const s = localStorage.getItem('panini2026'); if(s) state = JSON.parse(s); } catch(e) {}
+
+function save() { try { localStorage.setItem('panini2026', JSON.stringify(state)); } catch(e) {} }
+function key(id, i) { return id + '_' + i; }
+function getSt(id, i) { return state[key(id,i)] || 0; }
+
+function setSt(id, i) {
+  state[key(id,i)] = ((state[key(id,i)]||0)+1)%3;
+  save();
+  refreshStats();
+  refreshCard(id);
+}
+
+function getTengo(sel) {
+  let t=0; for(let i=0;i<sel.n;i++) if(getSt(sel.id,i)>=1) t++; return t;
+}
+function getRep(sel) {
+  let r=0; for(let i=0;i<sel.n;i++) if(getSt(sel.id,i)===2) r++; return r;
+}
+
+function refreshStats() {
+  const total = ALBUM.reduce((a,s)=>a+s.n,0);
+  let tengo=0, repet=0;
+  for(const k in state){ if(state[k]===1) tengo++; if(state[k]===2){tengo++;repet++;} }
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-tengo').textContent = tengo;
+  document.getElementById('s-faltan').textContent = total-tengo;
+  document.getElementById('s-repet').textContent = repet;
+  const pct = Math.round(tengo/total*100);
+  document.getElementById('s-pct').textContent = pct+'%';
+  document.getElementById('g-fill').style.width = pct+'%';
+}
+
+function refreshCard(id) {
+  const sel = ALBUM.find(s=>s.id===id); if(!sel) return;
+  const t = getTengo(sel);
+  const pct = Math.round(t/sel.n*100);
+  const card = document.querySelector('[data-id="'+id+'"]');
+  if(!card) return;
+  card.classList.toggle('completa', t===sel.n);
+  const fill = card.querySelector('.mini-fill');
+  if(fill) fill.style.width = pct+'%';
+  const sub = card.querySelector('.sel-sub');
+  if(sub) sub.textContent = t+'/'+sel.n+' láminas'+( t===sel.n ? ' ✓' : '');
+  const pctEl = card.querySelector('.sel-pct');
+  if(pctEl) pctEl.textContent = pct>0 ? pct+'%' : '';
+  if(openCards[id]) renderStickers(id);
+}
+
+function renderStickers(id) {
+  const grid = document.getElementById('sgrid_'+id); if(!grid) return;
+  const sel = ALBUM.find(s=>s.id===id); if(!sel) return;
+  grid.innerHTML='';
+  for(let i=0;i<sel.n;i++){
+    const st=getSt(id,i);
+    const d=document.createElement('div');
+    d.className='sticker'+(st===1?' t':st===2?' r':'');
+    d.textContent=i+1;
+    d.title=st===0?'Falta':st===1?'La tengo':'Repetida';
+    d.onclick=(()=>{const idx=i;return()=>{setSt(id,idx);}})();
+    grid.appendChild(d);
+  }
+}
+
+function toggleCard(id) {
+  openCards[id]=!openCards[id];
+  const panel=document.getElementById('panel_'+id);
+  const chev=document.getElementById('chev_'+id);
+  if(panel){ panel.classList.toggle('open',openCards[id]); if(openCards[id]) renderStickers(id); }
+  if(chev){ chev.classList.toggle('open',openCards[id]); }
+}
+
+function marcarTodas(id) {
+  const sel=ALBUM.find(s=>s.id===id); if(!sel) return;
+  const t=getTengo(sel);
+  if(t===sel.n){ for(let i=0;i<sel.n;i++) state[key(id,i)]=0; }
+  else { for(let i=0;i<sel.n;i++) if(getSt(id,i)===0) state[key(id,i)]=1; }
+  save(); refreshStats(); refreshCard(id);
+}
+
+function setFiltro(f, btn) {
+  filtro=f;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filtrar();
+}
+
+function filtrar() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let visible=0;
+  document.querySelectorAll('.grupo-section').forEach(sec=>{
+    let secVisible=0;
+    sec.querySelectorAll('.sel-card').forEach(card=>{
+      const id=card.dataset.id;
+      const sel=ALBUM.find(s=>s.id===id); if(!sel) return;
+      const matchQ = sel.name.toLowerCase().includes(q)||sel.grupo.toLowerCase().includes(q);
+      let matchF=true;
+      const t=getTengo(sel); const r=getRep(sel);
+      if(filtro==='faltan') matchF=t<sel.n;
+      else if(filtro==='completas') matchF=t===sel.n;
+      else if(filtro==='repetidas') matchF=r>0;
+      const show=matchQ&&matchF;
+      card.style.display=show?'':'none';
+      if(show){secVisible++;visible++;}
+    });
+    sec.style.display=secVisible>0?'':'none';
+  });
+  document.getElementById('empty').style.display=visible===0?'block':'none';
+}
+
+function exportar() {
+  let lines=['LÁMINAS FALTANTES — PANINI MUNDIAL 2026','Generado: '+new Date().toLocaleDateString('es-CO'),''];
+  let hayFaltantes=false;
+  ALBUM.forEach(sel=>{
+    const f=[];
+    for(let i=0;i<sel.n;i++) if(getSt(sel.id,i)===0) f.push(i+1);
+    if(f.length>0 && f.length<sel.n){ hayFaltantes=true; lines.push(sel.flag+' '+sel.name+' ('+sel.grupo+'): '+f.join(', ')); }
+  });
+  if(!hayFaltantes){ toast('Aún no has marcado ninguna lámina'); return; }
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='faltantes_panini_2026.txt';
+  a.click();
+  toast('Lista exportada');
+}
+
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function buildUI() {
+  const grupos={};
+  ALBUM.forEach(sel=>{ if(!grupos[sel.grupo]) grupos[sel.grupo]=[]; grupos[sel.grupo].push(sel); });
+  let html='';
+  for(const grupo in grupos){
+    html+=`<div class="grupo-section">
+      <div class="grupo-titulo">${grupo}</div>`;
+    grupos[grupo].forEach(sel=>{
+      const t=getTengo(sel);
+      const pct=Math.round(t/sel.n*100);
+      html+=`<div class="sel-card${t===sel.n?' completa':''}" data-id="${sel.id}">
+        <div class="sel-header" onclick="toggleCard('${sel.id}')">
+          <span class="flag">${sel.flag}</span>
+          <div class="sel-info">
+            <div class="sel-name">${sel.name}</div>
+            <div class="sel-sub">${t}/${sel.n} láminas${t===sel.n?' ✓':''}</div>
+          </div>
+          <span class="sel-pct">${pct>0?pct+'%':''}</span>
+          <span class="chevron" id="chev_${sel.id}">▼</span>
+        </div>
+        <div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div>
+        <div class="stickers-panel" id="panel_${sel.id}">
+          <div class="stickers-actions">
+            <button class="sbtn" onclick="event.stopPropagation();marcarTodas('${sel.id}')">Marcar / desmarcar todas</button>
+          </div>
+          <div class="stickers-grid" id="sgrid_${sel.id}"></div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('contenedor').innerHTML=html;
+  refreshStats();
+}
+
+buildUI();
+</script>
+</body>
+</html>
