@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Álbum Panini — Mundial 2026</title>
+<title>FIFA World Cup 2026</title>
 <style>
 :root {
   --v:#1D9E75;--vb:#E1F5EE;--vbr:#5DCAA5;
@@ -80,7 +80,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sel-card{background:var(--card);border:0.5px solid var(--brd);border-radius:var(--r);margin-bottom:5px;overflow:hidden;transition:border-color .2s}
 .sel-card.done{border-color:var(--vbr)}
 .sel-head{display:flex;align-items:center;gap:9px;padding:9px 11px;cursor:pointer;user-select:none}
-.flag{font-size:21px;line-height:1;flex-shrink:0}
+.flag{font-size:21px;line-height:1;flex-shrink:0}.flag-img{width:28px;height:21px;object-fit:cover;border-radius:2px;flex-shrink:0}
 .sel-info{flex:1;min-width:0}
 .sel-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sel-sub{font-size:12px;color:var(--tx2);margin-top:1px}
@@ -114,14 +114,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .empty{text-align:center;padding:36px 20px;color:var(--tx3);font-size:14px}
 @media(max-width:420px){.stats-bar{grid-template-columns:repeat(2,1fr)}.stat-num{font-size:21px}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="screen-login">
   <div class="login-box">
-    <div class="login-ball">⚽</div>
-    <h1>Álbum Panini 2026</h1>
+    <div class="login-ball">
+      <svg viewBox="0 0 120 160" width="90" height="120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="goldG" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFD700"/>
+            <stop offset="40%" style="stop-color:#FFF0A0"/>
+            <stop offset="70%" style="stop-color:#DAA520"/>
+            <stop offset="100%" style="stop-color:#B8860B"/>
+          </linearGradient>
+          <linearGradient id="baseG" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#DAA520"/>
+            <stop offset="100%" style="stop-color:#8B6914"/>
+          </linearGradient>
+        </defs>
+        <rect x="28" y="138" width="64" height="10" rx="3" fill="url(#baseG)"/>
+        <rect x="46" y="118" width="28" height="22" rx="2" fill="url(#goldG)"/>
+        <rect x="38" y="133" width="44" height="8" rx="2" fill="url(#baseG)"/>
+        <path d="M20,20 Q18,75 38,105 Q50,118 60,118 Q70,118 82,105 Q102,75 100,20 Z" fill="url(#goldG)"/>
+        <path d="M20,30 Q4,30 4,55 Q4,78 20,78" stroke="url(#goldG)" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="M100,30 Q116,30 116,55 Q116,78 100,78" stroke="url(#goldG)" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="M38,28 Q45,22 55,25 Q50,55 42,75" fill="rgba(255,255,255,0.22)"/>
+        <ellipse cx="60" cy="65" rx="28" ry="35" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1.5"/>
+        <line x1="32" y1="65" x2="88" y2="65" stroke="rgba(0,0,0,0.12)" stroke-width="1.5"/>
+        <path d="M60,30 Q75,50 60,70 Q45,90 60,100" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1.2"/>
+        <circle cx="48" cy="42" r="5" fill="rgba(255,255,255,0.35)"/>
+      </svg>
+    </div>
+    <h1>FIFA World Cup 2026</h1>
     <p>Ingresa tu nombre o apodo para acceder a tu progreso</p>
     <input id="inp-nombre" type="text" placeholder="Tu nombre o apodo" maxlength="30" autocomplete="off">
     <button class="btn-primary" id="btn-entrar" disabled onclick="entrar()">Entrar al álbum</button>
@@ -203,10 +230,13 @@ const ALBUM = [
     {c:"FWC14", n:"Estadios"},
     {c:"FWC15", n:"Estadios"},
     {c:"FWC16", n:"Estadios"},
+    {c:"FWC17", n:"Historia del torneo"},
+    {c:"FWC18", n:"Récords mundiales"},
+    {c:"FWC19", n:"Caminos al mundial"},
   ]},
 
   // ── GRUPO A ──
-  {id:"MEX", name:"México",           flag:"🇲🇽", grupo:"Grupo A", stickers:[
+  {id:"MEX", name:"México",           flag:"https://flagcdn.com/24x18/mx.png", grupo:"Grupo A", stickers:[
     {c:"MEX1",  n:"Escudo"},
     {c:"MEX2",  n:"Luis Malagón"},
     {c:"MEX3",  n:"Johan Vásquez"},
@@ -228,7 +258,7 @@ const ALBUM = [
     {c:"MEX19", n:"Raúl Jiménez"},
     {c:"MEX20", n:"Julián Quiñones"},
   ]},
-  {id:"RSA", name:"Sudáfrica",        flag:"🇿🇦", grupo:"Grupo A", stickers:[
+  {id:"RSA", name:"Sudáfrica",        flag:"https://flagcdn.com/24x18/za.png", grupo:"Grupo A", stickers:[
     {c:"RSA1",  n:"Escudo"},{c:"RSA2",n:"Ronwen Williams"},{c:"RSA3",n:"Siyanda Xulu"},
     {c:"RSA4",  n:"Mothobi Mvala"},{c:"RSA5",n:"Teboho Mokoena"},{c:"RSA6",n:"Bongani Zungu"},
     {c:"RSA7",  n:"Goodman Mosele"},{c:"RSA8",n:"Themba Zwane"},{c:"RSA9",n:"Percy Tau"},
@@ -237,7 +267,7 @@ const ALBUM = [
     {c:"RSA16", n:"Mojela"},{c:"RSA17",n:"Ratomo"},{c:"RSA18",n:"Mkhize"},
     {c:"RSA19", n:"Mofokeng"},{c:"RSA20",n:"Shabalala"},
   ]},
-  {id:"KOR", name:"Corea del Sur",    flag:"🇰🇷", grupo:"Grupo A", stickers:[
+  {id:"KOR", name:"Corea del Sur",    flag:"https://flagcdn.com/24x18/kr.png", grupo:"Grupo A", stickers:[
     {c:"KOR1",  n:"Escudo"},{c:"KOR2",n:"Kim Seung-gyu"},{c:"KOR3",n:"Kim Min-jae"},
     {c:"KOR4",  n:"Kim Young-gwon"},{c:"KOR5",n:"Kim Jin-su"},{c:"KOR6",n:"Lee Ki-je"},
     {c:"KOR7",  n:"Hwang In-beom"},{c:"KOR8",n:"Lee Jae-sung"},{c:"KOR9",n:"Son Heung-min"},
@@ -246,7 +276,7 @@ const ALBUM = [
     {c:"KOR16", n:"Lee Kang-in"},{c:"KOR17",n:"Jeong Sang-bin"},{c:"KOR18",n:"Bae Jun-ho"},
     {c:"KOR19", n:"Kwon Chang-hoon"},{c:"KOR20",n:"Kim Min-jun"},
   ]},
-  {id:"CZE", name:"Rep. Checa",       flag:"🇨🇿", grupo:"Grupo A", stickers:[
+  {id:"CZE", name:"Rep. Checa",       flag:"https://flagcdn.com/24x18/cz.png", grupo:"Grupo A", stickers:[
     {c:"CZE1",  n:"Escudo"},{c:"CZE2",n:"Jiří Staněk"},{c:"CZE3",n:"Tomáš Holeš"},
     {c:"CZE4",  n:"Tomáš Vlček"},{c:"CZE5",n:"Vladimír Coufal"},{c:"CZE6",n:"Lukáš Hrádecký"},
     {c:"CZE7",  n:"Ladislav Krejčí"},{c:"CZE8",n:"Lukáš Provod"},{c:"CZE9",n:"Ondřej Lingr"},
@@ -257,7 +287,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO B ──
-  {id:"CAN", name:"Canadá",           flag:"🇨🇦", grupo:"Grupo B", stickers:[
+  {id:"CAN", name:"Canadá",           flag:"https://flagcdn.com/24x18/ca.png", grupo:"Grupo B", stickers:[
     {c:"CAN1",  n:"Escudo"},{c:"CAN2",n:"Maxime Crépeau"},{c:"CAN3",n:"Alistair Johnston"},
     {c:"CAN4",  n:"Kamal Miller"},{c:"CAN5",n:"Steven Vitória"},{c:"CAN6",n:"Derek Cornelius"},
     {c:"CAN7",  n:"Atiba Hutchinson"},{c:"CAN8",n:"Stephen Eustáquio"},{c:"CAN9",n:"Jonathan Osorio"},
@@ -266,7 +296,7 @@ const ALBUM = [
     {c:"CAN16", n:"Ismael Koné"},{c:"CAN17",n:"Richie Laryea"},{c:"CAN18",n:"Ali Ahmed"},
     {c:"CAN19", n:"Lucas Cavallini"},{c:"CAN20",n:"Theo Corbeanu"},
   ]},
-  {id:"BIH", name:"Bosnia y Herz.",   flag:"🇧🇦", grupo:"Grupo B", stickers:[
+  {id:"BIH", name:"Bosnia y Herz.",   flag:"https://flagcdn.com/24x18/ba.png", grupo:"Grupo B", stickers:[
     {c:"BIH1",  n:"Escudo"},{c:"BIH2",n:"Kenan Piric"},{c:"BIH3",n:"Ermin Bičakčić"},
     {c:"BIH4",  n:"Anel Ahmedhodžić"},{c:"BIH5",n:"Vedran Ćorluka"},{c:"BIH6",n:"Sead Kolašinac"},
     {c:"BIH7",  n:"Miralem Pjanić"},{c:"BIH8",n:"Samir Merzić"},{c:"BIH9",n:"Edin Džeko"},
@@ -275,7 +305,7 @@ const ALBUM = [
     {c:"BIH16", n:"Amer Gojak"},{c:"BIH17",n:"Dario Šimić"},{c:"BIH18",n:"Eldar Čivić"},
     {c:"BIH19", n:"Benjamin Šejić"},{c:"BIH20",n:"Luka Menalo"},
   ]},
-  {id:"QAT", name:"Qatar",            flag:"🇶🇦", grupo:"Grupo B", stickers:[
+  {id:"QAT", name:"Qatar",            flag:"https://flagcdn.com/24x18/qa.png", grupo:"Grupo B", stickers:[
     {c:"QAT1",  n:"Escudo"},{c:"QAT2",n:"Meshaal Barsham"},{c:"QAT3",n:"Pedro Miguel"},
     {c:"QAT4",  n:"Boualem Khoukhi"},{c:"QAT5",n:"Bassam Al-Rawi"},{c:"QAT6",n:"Homam Ahmed"},
     {c:"QAT7",  n:"Hassan Al-Haydos"},{c:"QAT8",n:"Karim Boudiaf"},{c:"QAT9",n:"Akram Afif"},
@@ -284,7 +314,7 @@ const ALBUM = [
     {c:"QAT16", n:"Khalid Muneer"},{c:"QAT17",n:"Yusuf Abdurisag"},{c:"QAT18",n:"Ahmed Alaaeldin"},
     {c:"QAT19", n:"Jalmood"},{c:"QAT20",n:"Tarek Salman"},
   ]},
-  {id:"SUI", name:"Suiza",            flag:"🇨🇭", grupo:"Grupo B", stickers:[
+  {id:"SUI", name:"Suiza",            flag:"https://flagcdn.com/24x18/ch.png", grupo:"Grupo B", stickers:[
     {c:"SUI1",  n:"Escudo"},{c:"SUI2",n:"Yann Sommer"},{c:"SUI3",n:"Manuel Akanji"},
     {c:"SUI4",  n:"Fabian Schär"},{c:"SUI5",n:"Silvan Widmer"},{c:"SUI6",n:"Ricardo Rodríguez"},
     {c:"SUI7",  n:"Granit Xhaka"},{c:"SUI8",n:"Remo Freuler"},{c:"SUI9",n:"Xherdan Shaqiri"},
@@ -295,7 +325,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO C ──
-  {id:"BRA", name:"Brasil",           flag:"🇧🇷", grupo:"Grupo C", stickers:[
+  {id:"BRA", name:"Brasil",           flag:"https://flagcdn.com/24x18/br.png", grupo:"Grupo C", stickers:[
     {c:"BRA1",  n:"Escudo"},{c:"BRA2",n:"Alisson"},{c:"BRA3",n:"Marquinhos"},
     {c:"BRA4",  n:"Éder Militão"},{c:"BRA5",n:"Danilo"},{c:"BRA6",n:"Alex Telles"},
     {c:"BRA7",  n:"Casemiro"},{c:"BRA8",n:"Bruno Guimarães"},{c:"BRA9",n:"Lucas Paquetá"},
@@ -304,7 +334,7 @@ const ALBUM = [
     {c:"BRA16", n:"Andreas Pereira"},{c:"BRA17",n:"Gabriel Martinelli"},{c:"BRA18",n:"Gabriel Jesus"},
     {c:"BRA19", n:"Igor Jesus"},{c:"BRA20",n:"Gabriel Magalhães"},
   ]},
-  {id:"MAR", name:"Marruecos",        flag:"🇲🇦", grupo:"Grupo C", stickers:[
+  {id:"MAR", name:"Marruecos",        flag:"https://flagcdn.com/24x18/ma.png", grupo:"Grupo C", stickers:[
     {c:"MAR1",  n:"Escudo"},{c:"MAR2",n:"Yassine Bounou"},{c:"MAR3",n:"Romain Saïss"},
     {c:"MAR4",  n:"Nayef Aguerd"},{c:"MAR5",n:"Achraf Hakimi"},{c:"MAR6",n:"Noussair Mazraoui"},
     {c:"MAR7",  n:"Selim Amallah"},{c:"MAR8",n:"Azzedine Ounahi"},{c:"MAR9",n:"Sofyan Amrabat"},
@@ -313,7 +343,7 @@ const ALBUM = [
     {c:"MAR16", n:"Ilias Chair"},{c:"MAR17",n:"Abde Ezzalzouli"},{c:"MAR18",n:"Zakaria Aboukhlal"},
     {c:"MAR19", n:"Youssef Aït Bennasser"},{c:"MAR20",n:"Anass Zaroury"},
   ]},
-  {id:"HAI", name:"Haití",            flag:"🇭🇹", grupo:"Grupo C", stickers:[
+  {id:"HAI", name:"Haití",            flag:"https://flagcdn.com/24x18/ht.png", grupo:"Grupo C", stickers:[
     {c:"HAI1",n:"Escudo"},{c:"HAI2",n:"Johny Placide"},{c:"HAI3",n:"Mechack Jérôme"},
     {c:"HAI4",n:"Steeven Saba"},{c:"HAI5",n:"Samuel Camille"},{c:"HAI6",n:"Kervens Désir"},
     {c:"HAI7",n:"Carnejy Antoine"},{c:"HAI8",n:"Duckens Nazon"},{c:"HAI9",n:"Nicolas Gélin"},
@@ -322,7 +352,7 @@ const ALBUM = [
     {c:"HAI16",n:"Jeff Louis"},{c:"HAI17",n:"Ronaldo Dorelien"},{c:"HAI18",n:"Stef Pau"},
     {c:"HAI19",n:"Pascal Millien"},{c:"HAI20",n:"Kevin Lafrance"},
   ]},
-  {id:"SCO", name:"Escocia",          flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿", grupo:"Grupo C", stickers:[
+  {id:"SCO", name:"Escocia",          flag:"https://flagcdn.com/24x18/gb-sct.png", grupo:"Grupo C", stickers:[
     {c:"SCO1",  n:"Escudo"},{c:"SCO2",n:"Angus Gunn"},{c:"SCO3",n:"Grant Hanley"},
     {c:"SCO4",  n:"Jack Hendry"},{c:"SCO5",n:"Andrew Robertson"},{c:"SCO6",n:"Aaron Hickey"},
     {c:"SCO7",  n:"Scott McTominay"},{c:"SCO8",n:"John McGinn"},{c:"SCO9",n:"Stuart Armstrong"},
@@ -333,7 +363,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO D ──
-  {id:"USA", name:"Estados Unidos",   flag:"🇺🇸", grupo:"Grupo D", stickers:[
+  {id:"USA", name:"Estados Unidos",   flag:"https://flagcdn.com/24x18/us.png", grupo:"Grupo D", stickers:[
     {c:"USA1",  n:"Escudo"},{c:"USA2",n:"Matt Freese"},{c:"USA3",n:"Chris Richards"},
     {c:"USA4",  n:"Tim Ream"},{c:"USA5",n:"Mark McKenzie"},{c:"USA6",n:"Alex Freeman"},
     {c:"USA7",  n:"Antonee Robinson"},{c:"USA8",n:"Tyler Adams"},{c:"USA9",n:"Tanner Tessmann"},
@@ -342,7 +372,7 @@ const ALBUM = [
     {c:"USA16", n:"Christian Pulisic"},{c:"USA17",n:"Brenden Aaronson"},{c:"USA18",n:"Ricardo Pepi"},
     {c:"USA19", n:"Haji Wright"},{c:"USA20",n:"Folarin Balogun"},
   ]},
-  {id:"PAR", name:"Paraguay",         flag:"🇵🇾", grupo:"Grupo D", stickers:[
+  {id:"PAR", name:"Paraguay",         flag:"https://flagcdn.com/24x18/py.png", grupo:"Grupo D", stickers:[
     {c:"PAR1",  n:"Escudo"},{c:"PAR2",n:"Antony Silva"},{c:"PAR3",n:"Gustavo Gómez"},
     {c:"PAR4",  n:"Omar Alderete"},{c:"PAR5",n:"Fabián Balbuena"},{c:"PAR6",n:"Óscar Romero"},
     {c:"PAR7",  n:"Mathías Villasanti"},{c:"PAR8",n:"Andrés Cubas"},{c:"PAR9",n:"Miguel Almirón"},
@@ -351,7 +381,7 @@ const ALBUM = [
     {c:"PAR16", n:"Braian Samudio"},{c:"PAR17",n:"Richard Sánchez"},{c:"PAR18",n:"Bobadilla"},
     {c:"PAR19", n:"Lezcano"},{c:"PAR20",n:"Ortiz"},
   ]},
-  {id:"AUS", name:"Australia",        flag:"🇦🇺", grupo:"Grupo D", stickers:[
+  {id:"AUS", name:"Australia",        flag:"https://flagcdn.com/24x18/au.png", grupo:"Grupo D", stickers:[
     {c:"AUS1",  n:"Escudo"},{c:"AUS2",n:"Mat Ryan"},{c:"AUS3",n:"Harry Souttar"},
     {c:"AUS4",  n:"Miloš Degenek"},{c:"AUS5",n:"Aziz Behich"},{c:"AUS6",n:"Nathaniel Atkinson"},
     {c:"AUS7",  n:"Jackson Irvine"},{c:"AUS8",n:"Aaron Mooy"},{c:"AUS9",n:"Riley McGree"},
@@ -360,7 +390,7 @@ const ALBUM = [
     {c:"AUS16", n:"Ajdin Hrustić"},{c:"AUS17",n:"Craig Goodwin"},{c:"AUS18",n:"Nestorovski"},
     {c:"AUS19", n:"Marco Tilio"},{c:"AUS20",n:"Brandon Borrello"},
   ]},
-  {id:"TUR", name:"Turquía",          flag:"🇹🇷", grupo:"Grupo D", stickers:[
+  {id:"TUR", name:"Turquía",          flag:"https://flagcdn.com/24x18/tr.png", grupo:"Grupo D", stickers:[
     {c:"TUR1",  n:"Escudo"},{c:"TUR2",n:"Uğurcan Çakır"},{c:"TUR3",n:"Merih Demiral"},
     {c:"TUR4",  n:"Samet Akaydın"},{c:"TUR5",n:"Zeki Çelik"},{c:"TUR6",n:"Ferdi Kadıoğlu"},
     {c:"TUR7",  n:"Hakan Çalhanoğlu"},{c:"TUR8",n:"İsmail Yüksek"},{c:"TUR9",n:"Salih Özcan"},
@@ -371,7 +401,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO E ──
-  {id:"GER", name:"Alemania",         flag:"🇩🇪", grupo:"Grupo E", stickers:[
+  {id:"GER", name:"Alemania",         flag:"https://flagcdn.com/24x18/de.png", grupo:"Grupo E", stickers:[
     {c:"GER1",  n:"Escudo"},{c:"GER2",n:"Manuel Neuer"},{c:"GER3",n:"Antonio Rüdiger"},
     {c:"GER4",  n:"Jonathan Tah"},{c:"GER5",n:"Joshua Kimmich"},{c:"GER6",n:"Robin Gosens"},
     {c:"GER7",  n:"Robert Andrich"},{c:"GER8",n:"Toni Kroos"},{c:"GER9",n:"Ilkay Gündogan"},
@@ -380,7 +410,7 @@ const ALBUM = [
     {c:"GER16", n:"Niclas Füllkrug"},{c:"GER17",n:"Chris Führich"},{c:"GER18",n:"Maximilian Mittelstädt"},
     {c:"GER19", n:"Benjamin Henrichs"},{c:"GER20",n:"Pascal Groß"},
   ]},
-  {id:"CUW", name:"Curazao",          flag:"🇨🇼", grupo:"Grupo E", stickers:[
+  {id:"CUW", name:"Curazao",          flag:"https://flagcdn.com/24x18/cw.png", grupo:"Grupo E", stickers:[
     {c:"CUW1",n:"Escudo"},{c:"CUW2",n:"Eloy Room"},{c:"CUW3",n:"Ethan Sambo"},
     {c:"CUW4",n:"Rangelo Janga"},{c:"CUW5",n:"Leandro Bacuna"},{c:"CUW6",n:"Cuco Martina"},
     {c:"CUW7",n:"Jürgen Locadia"},{c:"CUW8",n:"Brandley Kuwas"},{c:"CUW9",n:"Dion Malone"},
@@ -389,7 +419,7 @@ const ALBUM = [
     {c:"CUW16",n:"Giliano Wijnaldum"},{c:"CUW17",n:"Raily Ignacio"},{c:"CUW18",n:"Frensel Martina"},
     {c:"CUW19",n:"Jurickson Profar"},{c:"CUW20",n:"Wavell Hinds"},
   ]},
-  {id:"CIV", name:"Costa de Marfil",  flag:"🇨🇮", grupo:"Grupo E", stickers:[
+  {id:"CIV", name:"Costa de Marfil",  flag:"https://flagcdn.com/24x18/ci.png", grupo:"Grupo E", stickers:[
     {c:"CIV1",  n:"Escudo"},{c:"CIV2",n:"Badra Ali Sangaré"},{c:"CIV3",n:"Serge Aurier"},
     {c:"CIV4",  n:"Simon Deli"},{c:"CIV5",n:"Odilon Kossounou"},{c:"CIV6",n:"Wilfried Singo"},
     {c:"CIV7",  n:"Franck Kessié"},{c:"CIV8",n:"Seko Fofana"},{c:"CIV9",n:"Jean Michaël Seri"},
@@ -398,7 +428,7 @@ const ALBUM = [
     {c:"CIV16", n:"Karim Konaté"},{c:"CIV17",n:"Simon Adingra"},{c:"CIV18",n:"Amad Diallo"},
     {c:"CIV19", n:"Mory Koné"},{c:"CIV20",n:"Ibrahim Sangaré"},
   ]},
-  {id:"ECU", name:"Ecuador",          flag:"🇪🇨", grupo:"Grupo E", stickers:[
+  {id:"ECU", name:"Ecuador",          flag:"https://flagcdn.com/24x18/ec.png", grupo:"Grupo E", stickers:[
     {c:"ECU1",  n:"Escudo"},{c:"ECU2",n:"Hernán Galíndez"},{c:"ECU3",n:"Félix Torres"},
     {c:"ECU4",  n:"Piero Hincapié"},{c:"ECU5",n:"Byron Castillo"},{c:"ECU6",n:"Pervis Estupiñán"},
     {c:"ECU7",  n:"Carlos Gruezo"},{c:"ECU8",n:"Moisés Caicedo"},{c:"ECU9",n:"Jhegson Méndez"},
@@ -409,7 +439,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO F ──
-  {id:"NED", name:"Países Bajos",     flag:"🇳🇱", grupo:"Grupo F", stickers:[
+  {id:"NED", name:"Países Bajos",     flag:"https://flagcdn.com/24x18/nl.png", grupo:"Grupo F", stickers:[
     {c:"NED1",  n:"Escudo"},{c:"NED2",n:"Bart Verbruggen"},{c:"NED3",n:"Virgil van Dijk"},
     {c:"NED4",  n:"Stefan de Vrij"},{c:"NED5",n:"Denzel Dumfries"},{c:"NED6",n:"Daley Blind"},
     {c:"NED7",  n:"Frenkie de Jong"},{c:"NED8",n:"Teun Koopmeiners"},{c:"NED9",n:"Xavi Simons"},
@@ -418,7 +448,7 @@ const ALBUM = [
     {c:"NED16", n:"Ryan Gravenberch"},{c:"NED17",n:"Donyell Malen"},{c:"NED18",n:"Lutsharel Geertruida"},
     {c:"NED19", n:"Brian Brobbey"},{c:"NED20",n:"Joey Veerman"},
   ]},
-  {id:"JPN", name:"Japón",            flag:"🇯🇵", grupo:"Grupo F", stickers:[
+  {id:"JPN", name:"Japón",            flag:"https://flagcdn.com/24x18/jp.png", grupo:"Grupo F", stickers:[
     {c:"JPN1",  n:"Escudo"},{c:"JPN2",n:"Shuichi Gonda"},{c:"JPN3",n:"Maya Yoshida"},
     {c:"JPN4",  n:"Ko Itakura"},{c:"JPN5",n:"Hiroki Sakai"},{c:"JPN6",n:"Yuto Nagatomo"},
     {c:"JPN7",  n:"Wataru Endo"},{c:"JPN8",n:"Hidemasa Morita"},{c:"JPN9",n:"Yuki Soma"},
@@ -427,7 +457,7 @@ const ALBUM = [
     {c:"JPN16", n:"Takumi Minamino"},{c:"JPN17",n:"Shuto Machino"},{c:"JPN18",n:"Junya Ito"},
     {c:"JPN19", n:"Koki Ogawa"},{c:"JPN20",n:"Ayase Ueda"},
   ]},
-  {id:"SWE", name:"Suecia",           flag:"🇸🇪", grupo:"Grupo F", stickers:[
+  {id:"SWE", name:"Suecia",           flag:"https://flagcdn.com/24x18/se.png", grupo:"Grupo F", stickers:[
     {c:"SWE1",  n:"Escudo"},{c:"SWE2",n:"Robin Olsen"},{c:"SWE3",n:"Victor Lindelöf"},
     {c:"SWE4",  n:"Isak Hien"},{c:"SWE5",n:"Emil Krafth"},{c:"SWE6",n:"Ludwig Augustinsson"},
     {c:"SWE7",  n:"Albin Ekdal"},{c:"SWE8",n:"Mattias Svanberg"},{c:"SWE9",n:"Dejan Kulusevski"},
@@ -436,7 +466,7 @@ const ALBUM = [
     {c:"SWE16", n:"Samuel Chukwueze"},{c:"SWE17",n:"Jesper Karlsson"},{c:"SWE18",n:"Karl-Johan Johnsson"},
     {c:"SWE19", n:"Ewoud Pletinckx"},{c:"SWE20",n:"Williot Swedberg"},
   ]},
-  {id:"TUN", name:"Túnez",            flag:"🇹🇳", grupo:"Grupo F", stickers:[
+  {id:"TUN", name:"Túnez",            flag:"https://flagcdn.com/24x18/tn.png", grupo:"Grupo F", stickers:[
     {c:"TUN1",  n:"Escudo"},{c:"TUN2",n:"Aymen Dahmen"},{c:"TUN3",n:"Yassine Meriah"},
     {c:"TUN4",  n:"Dylan Bronn"},{c:"TUN5",n:"Ali Maâloul"},{c:"TUN6",n:"Montassar Talbi"},
     {c:"TUN7",  n:"Aïssa Laïdouni"},{c:"TUN8",n:"Ellyes Skhiri"},{c:"TUN9",n:"Hannibal Mejbri"},
@@ -447,7 +477,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO G ──
-  {id:"BEL", name:"Bélgica",          flag:"🇧🇪", grupo:"Grupo G", stickers:[
+  {id:"BEL", name:"Bélgica",          flag:"https://flagcdn.com/24x18/be.png", grupo:"Grupo G", stickers:[
     {c:"BEL1",  n:"Escudo"},{c:"BEL2",n:"Thibaut Courtois"},{c:"BEL3",n:"Toby Alderweireld"},
     {c:"BEL4",  n:"Jan Vertonghen"},{c:"BEL5",n:"Thomas Meunier"},{c:"BEL6",n:"Yannick Carrasco"},
     {c:"BEL7",  n:"Kevin De Bruyne"},{c:"BEL8",n:"Axel Witsel"},{c:"BEL9",n:"Youri Tielemans"},
@@ -456,7 +486,7 @@ const ALBUM = [
     {c:"BEL16", n:"Lois Openda"},{c:"BEL17",n:"Arthur Theate"},{c:"BEL18",n:"Amadou Onana"},
     {c:"BEL19", n:"Johan Bakayoko"},{c:"BEL20",n:"Orel Mangala"},
   ]},
-  {id:"EGY", name:"Egipto",           flag:"🇪🇬", grupo:"Grupo G", stickers:[
+  {id:"EGY", name:"Egipto",           flag:"https://flagcdn.com/24x18/eg.png", grupo:"Grupo G", stickers:[
     {c:"EGY1",  n:"Escudo"},{c:"EGY2",n:"Mohamed El-Shenawy"},{c:"EGY3",n:"Ahmed Hegazi"},
     {c:"EGY4",  n:"Omar Kamal"},{c:"EGY5",n:"Mohamed Hamdy"},{c:"EGY6",n:"Akram Tawfik"},
     {c:"EGY7",  n:"Tarek Hamed"},{c:"EGY8",n:"Amr El-Sulaya"},{c:"EGY9",n:"Emam Ashour"},
@@ -465,7 +495,7 @@ const ALBUM = [
     {c:"EGY16", n:"Ahmed Sayed"},{c:"EGY17",n:"Zizo"},{c:"EGY18",n:"Kahraba"},
     {c:"EGY19", n:"Mahmoud Hassan"},{c:"EGY20",n:"Sameh Serry"},
   ]},
-  {id:"IRN", name:"Irán",             flag:"🇮🇷", grupo:"Grupo G", stickers:[
+  {id:"IRN", name:"Irán",             flag:"https://flagcdn.com/24x18/ir.png", grupo:"Grupo G", stickers:[
     {c:"IRN1",  n:"Escudo"},{c:"IRN2",n:"Alireza Beiranvand"},{c:"IRN3",n:"Majid Hosseini"},
     {c:"IRN4",  n:"Milad Mohammadi"},{c:"IRN5",n:"Ramin Rezaeian"},{c:"IRN6",n:"Shoja Khalilzadeh"},
     {c:"IRN7",  n:"Saeid Ezatolahi"},{c:"IRN8",n:"Ahmad Nourollahi"},{c:"IRN9",n:"Ali Karimi"},
@@ -474,7 +504,7 @@ const ALBUM = [
     {c:"IRN16", n:"Allahyar Sayyadmanesh"},{c:"IRN17",n:"Alireza Jahanbakhsh"},{c:"IRN18",n:"Morteza Pouraliganji"},
     {c:"IRN19", n:"Amir Abedzadeh"},{c:"IRN20",n:"Omid Noorafkan"},
   ]},
-  {id:"NZL", name:"Nueva Zelanda",    flag:"🇳🇿", grupo:"Grupo G", stickers:[
+  {id:"NZL", name:"Nueva Zelanda",    flag:"https://flagcdn.com/24x18/nz.png", grupo:"Grupo G", stickers:[
     {c:"NZL1",  n:"Escudo"},{c:"NZL2",n:"Stefan Marinovic"},{c:"NZL3",n:"Winston Reid"},
     {c:"NZL4",  n:"Niko Kirwan"},{c:"NZL5",n:"Tommy Smith"},{c:"NZL6",n:"Liberato Cacace"},
     {c:"NZL7",  n:"Ryan Thomas"},{c:"NZL8",n:"Callum McCowatt"},{c:"NZL9",n:"Tim Payne"},
@@ -485,7 +515,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO H ──
-  {id:"ESP", name:"España",           flag:"🇪🇸", grupo:"Grupo H", stickers:[
+  {id:"ESP", name:"España",           flag:"https://flagcdn.com/24x18/es.png", grupo:"Grupo H", stickers:[
     {c:"ESP1",  n:"Escudo"},{c:"ESP2",n:"Unai Simón"},{c:"ESP3",n:"Aymeric Laporte"},
     {c:"ESP4",  n:"Robin Le Normand"},{c:"ESP5",n:"Dani Carvajal"},{c:"ESP6",n:"Alejandro Balde"},
     {c:"ESP7",  n:"Rodri"},{c:"ESP8",n:"Pedri"},{c:"ESP9",n:"Fabián Ruiz"},
@@ -494,7 +524,7 @@ const ALBUM = [
     {c:"ESP16", n:"Álvaro Morata"},{c:"ESP17",n:"Joselu"},{c:"ESP18",n:"Marcos Llorente"},
     {c:"ESP19", n:"Martín Zubimendi"},{c:"ESP20",n:"Yeremy Pino"},
   ]},
-  {id:"CPV", name:"Cabo Verde",       flag:"🇨🇻", grupo:"Grupo H", stickers:[
+  {id:"CPV", name:"Cabo Verde",       flag:"https://flagcdn.com/24x18/cv.png", grupo:"Grupo H", stickers:[
     {c:"CPV1",  n:"Escudo"},{c:"CPV2",n:"Josimar"},{c:"CPV3",n:"Roberto Lopes"},
     {c:"CPV4",  n:"Kenny Rocha"},{c:"CPV5",n:"Steven Fortes"},{c:"CPV6",n:"Jordan van der Gaag"},
     {c:"CPV7",  n:"Jamiro Monteiro"},{c:"CPV8",n:"Júlio Tavares"},{c:"CPV9",n:"Carlos Ponck"},
@@ -503,7 +533,7 @@ const ALBUM = [
     {c:"CPV16", n:"Willy Semedo"},{c:"CPV17",n:"Stopira"},{c:"CPV18",n:"Jeffry Fortes"},
     {c:"CPV19", n:"Lisandro Semedo"},{c:"CPV20",n:"Kady"},
   ]},
-  {id:"KSA", name:"Arabia Saudita",   flag:"🇸🇦", grupo:"Grupo H", stickers:[
+  {id:"KSA", name:"Arabia Saudita",   flag:"https://flagcdn.com/24x18/sa.png", grupo:"Grupo H", stickers:[
     {c:"KSA1",  n:"Escudo"},{c:"KSA2",n:"Mohammed Al-Owais"},{c:"KSA3",n:"Ali Al-Bulaihi"},
     {c:"KSA4",  n:"Abdulelah Al-Amri"},{c:"KSA5",n:"Hassan Tambakti"},{c:"KSA6",n:"Saud Abdulhamid"},
     {c:"KSA7",  n:"Mohammed Kanno"},{c:"KSA8",n:"Salman Al-Faraj"},{c:"KSA9",n:"Ali Al-Hassan"},
@@ -512,7 +542,7 @@ const ALBUM = [
     {c:"KSA16", n:"Riyadh Sharahili"},{c:"KSA17",n:"Nawaf Al-Abed"},{c:"KSA18",n:"Ali Al-Asmari"},
     {c:"KSA19", n:"Ibrahim Al-Qahtani"},{c:"KSA20",n:"Turki Al-Ammar"},
   ]},
-  {id:"URU", name:"Uruguay",          flag:"🇺🇾", grupo:"Grupo H", stickers:[
+  {id:"URU", name:"Uruguay",          flag:"https://flagcdn.com/24x18/uy.png", grupo:"Grupo H", stickers:[
     {c:"URU1",  n:"Escudo"},{c:"URU2",n:"Sergio Rochet"},{c:"URU3",n:"Diego Godín"},
     {c:"URU4",  n:"José María Giménez"},{c:"URU5",n:"Guillermo Varela"},{c:"URU6",n:"Matías Viña"},
     {c:"URU7",  n:"Mathías Olivera"},{c:"URU8",n:"Federico Valverde"},{c:"URU9",n:"Rodrigo Bentancur"},
@@ -523,7 +553,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO I ──
-  {id:"FRA", name:"Francia",          flag:"🇫🇷", grupo:"Grupo I", stickers:[
+  {id:"FRA", name:"Francia",          flag:"https://flagcdn.com/24x18/fr.png", grupo:"Grupo I", stickers:[
     {c:"FRA1",  n:"Escudo"},{c:"FRA2",n:"Mike Maignan"},{c:"FRA3",n:"Raphaël Varane"},
     {c:"FRA4",  n:"William Saliba"},{c:"FRA5",n:"Jules Koundé"},{c:"FRA6",n:"Théo Hernández"},
     {c:"FRA7",  n:"N'Golo Kanté"},{c:"FRA8",n:"Aurélien Tchouaméni"},{c:"FRA9",n:"Antoine Griezmann"},
@@ -532,7 +562,7 @@ const ALBUM = [
     {c:"FRA16", n:"Randal Kolo Muani"},{c:"FRA17",n:"Bradley Barcola"},{c:"FRA18",n:"Dayot Upamecano"},
     {c:"FRA19", n:"Benjamin Pavard"},{c:"FRA20",n:"Ibrahima Konaté"},
   ]},
-  {id:"SEN", name:"Senegal",          flag:"🇸🇳", grupo:"Grupo I", stickers:[
+  {id:"SEN", name:"Senegal",          flag:"https://flagcdn.com/24x18/sn.png", grupo:"Grupo I", stickers:[
     {c:"SEN1",  n:"Escudo"},{c:"SEN2",n:"Édouard Mendy"},{c:"SEN3",n:"Kalidou Koulibaly"},
     {c:"SEN4",  n:"Abdou Diallo"},{c:"SEN5",n:"Youssouf Sabaly"},{c:"SEN6",n:"Formose Mendy"},
     {c:"SEN7",  n:"Pape Matar Sarr"},{c:"SEN8",n:"Idrissa Gueye"},{c:"SEN9",n:"Nampalys Mendy"},
@@ -541,7 +571,7 @@ const ALBUM = [
     {c:"SEN16", n:"Nicolas Jackson"},{c:"SEN17",n:"Lamine Camara"},{c:"SEN18",n:"Iliman Ndiaye"},
     {c:"SEN19", n:"Cheikhou Kouyaté"},{c:"SEN20",n:"Fodé Baldé"},
   ]},
-  {id:"IRQ", name:"Irak",             flag:"🇮🇶", grupo:"Grupo I", stickers:[
+  {id:"IRQ", name:"Irak",             flag:"https://flagcdn.com/24x18/iq.png", grupo:"Grupo I", stickers:[
     {c:"IRQ1",  n:"Escudo"},{c:"IRQ2",n:"Jalal Hassan"},{c:"IRQ3",n:"Samer Saeed"},
     {c:"IRQ4",  n:"Ali Faez"},{c:"IRQ5",n:"Ahmed Ibrahim"},{c:"IRQ6",n:"Saad Natiq"},
     {c:"IRQ7",  n:"Amjad Attwan"},{c:"IRQ8",n:"Bashar Resan"},{c:"IRQ9",n:"Hussein Ali"},
@@ -550,7 +580,7 @@ const ALBUM = [
     {c:"IRQ16", n:"Ahmed Yasin"},{c:"IRQ17",n:"Ali Hamid"},{c:"IRQ18",n:"Karrar Jassim"},
     {c:"IRQ19", n:"Alaa Abbas"},{c:"IRQ20",n:"Ali Jasim"},
   ]},
-  {id:"NOR", name:"Noruega",          flag:"🇳🇴", grupo:"Grupo I", stickers:[
+  {id:"NOR", name:"Noruega",          flag:"https://flagcdn.com/24x18/no.png", grupo:"Grupo I", stickers:[
     {c:"NOR1",  n:"Escudo"},{c:"NOR2",n:"Ørjan Nyland"},{c:"NOR3",n:"Stefan Strandberg"},
     {c:"NOR4",  n:"Leo Ostigard"},{c:"NOR5",n:"Kristoffer Ajer"},{c:"NOR6",n:"Birger Meling"},
     {c:"NOR7",  n:"Sander Berge"},{c:"NOR8",n:"Martin Ødegaard"},{c:"NOR9",n:"Mathias Normann"},
@@ -561,7 +591,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO J ──
-  {id:"ARG", name:"Argentina",        flag:"🇦🇷", grupo:"Grupo J", stickers:[
+  {id:"ARG", name:"Argentina",        flag:"https://flagcdn.com/24x18/ar.png", grupo:"Grupo J", stickers:[
     {c:"ARG1",  n:"Escudo"},{c:"ARG2",n:"Emiliano Martínez"},{c:"ARG3",n:"Cristian Romero"},
     {c:"ARG4",  n:"Lisandro Martínez"},{c:"ARG5",n:"Nahuel Molina"},{c:"ARG6",n:"Marcos Acuña"},
     {c:"ARG7",  n:"Rodrigo De Paul"},{c:"ARG8",n:"Enzo Fernández"},{c:"ARG9",n:"Alexis Mac Allister"},
@@ -570,7 +600,7 @@ const ALBUM = [
     {c:"ARG16", n:"Giovani Lo Celso"},{c:"ARG17",n:"Thiago Almada"},{c:"ARG18",n:"Germán Pezzella"},
     {c:"ARG19", n:"Valentin Carboni"},{c:"ARG20",n:"Alejandro Garnacho"},
   ]},
-  {id:"ALG", name:"Argelia",          flag:"🇩🇿", grupo:"Grupo J", stickers:[
+  {id:"ALG", name:"Argelia",          flag:"https://flagcdn.com/24x18/dz.png", grupo:"Grupo J", stickers:[
     {c:"ALG1",  n:"Escudo"},{c:"ALG2",n:"Raïs M'Bolhi"},{c:"ALG3",n:"Aïssa Mandi"},
     {c:"ALG4",  n:"Djamel Benlamri"},{c:"ALG5",n:"Mehdi Zeffane"},{c:"ALG6",n:"Ramy Bensebaini"},
     {c:"ALG7",  n:"Adlène Guedioura"},{c:"ALG8",n:"Sofiane Feghouli"},{c:"ALG9",n:"Haris Belkebla"},
@@ -579,7 +609,7 @@ const ALBUM = [
     {c:"ALG16", n:"Aymen Mahious"},{c:"ALG17",n:"Billal Brahimi"},{c:"ALG18",n:"Dario Poveda"},
     {c:"ALG19", n:"Zinedine Ferhat"},{c:"ALG20",n:"Abdelkader Bedrane"},
   ]},
-  {id:"AUT", name:"Austria",          flag:"🇦🇹", grupo:"Grupo J", stickers:[
+  {id:"AUT", name:"Austria",          flag:"https://flagcdn.com/24x18/at.png", grupo:"Grupo J", stickers:[
     {c:"AUT1",  n:"Escudo"},{c:"AUT2",n:"Patrick Pentz"},{c:"AUT3",n:"David Alaba"},
     {c:"AUT4",  n:"Maximilian Wöber"},{c:"AUT5",n:"Stefan Lainer"},{c:"AUT6",n:"Philipp Mwene"},
     {c:"AUT7",  n:"Florian Grillitsch"},{c:"AUT8",n:"Konrad Laimer"},{c:"AUT9",n:"Marcel Sabitzer"},
@@ -588,7 +618,7 @@ const ALBUM = [
     {c:"AUT16", n:"Florian Kainz"},{c:"AUT17",n:"Romano Schmid"},{c:"AUT18",n:"Nicolas Seiwald"},
     {c:"AUT19", n:"Alexander Prass"},{c:"AUT20",n:"Andreas Weimann"},
   ]},
-  {id:"JOR", name:"Jordania",         flag:"🇯🇴", grupo:"Grupo J", stickers:[
+  {id:"JOR", name:"Jordania",         flag:"https://flagcdn.com/24x18/jo.png", grupo:"Grupo J", stickers:[
     {c:"JOR1",  n:"Escudo"},{c:"JOR2",n:"Yazeed Abulaila"},{c:"JOR3",n:"Ihsan Haddad"},
     {c:"JOR4",  n:"Mohammad Abu Hashish"},{c:"JOR5",n:"Yazan Al-Arab"},{c:"JOR6",n:"Abdallah Nasib"},
     {c:"JOR7",  n:"Saleem Obaid"},{c:"JOR8",n:"Mohammad Abualnadi"},{c:"JOR9",n:"Ibrahim Saadeh"},
@@ -599,7 +629,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO K ──
-  {id:"POR", name:"Portugal",         flag:"🇵🇹", grupo:"Grupo K", stickers:[
+  {id:"POR", name:"Portugal",         flag:"https://flagcdn.com/24x18/pt.png", grupo:"Grupo K", stickers:[
     {c:"POR1",  n:"Escudo"},{c:"POR2",n:"Diogo Costa"},{c:"POR3",n:"Rúben Dias"},
     {c:"POR4",  n:"Pepe"},{c:"POR5",n:"João Cancelo"},{c:"POR6",n:"Nuno Mendes"},
     {c:"POR7",  n:"Vitinha"},{c:"POR8",n:"João Palhinha"},{c:"POR9",n:"Bernardo Silva"},
@@ -608,7 +638,7 @@ const ALBUM = [
     {c:"POR16", n:"Francisco Conceição"},{c:"POR17",n:"Diogo Jota"},{c:"POR18",n:"Matheus Nunes"},
     {c:"POR19", n:"João Félix"},{c:"POR20",n:"Rúben Neves"},
   ]},
-  {id:"UZB", name:"Uzbekistán",       flag:"🇺🇿", grupo:"Grupo K", stickers:[
+  {id:"UZB", name:"Uzbekistán",       flag:"https://flagcdn.com/24x18/uz.png", grupo:"Grupo K", stickers:[
     {c:"UZB1",  n:"Escudo"},{c:"UZB2",n:"Utkir Yusupov"},{c:"UZB3",n:"Umid Hamrobekov"},
     {c:"UZB4",  n:"Sherzod Qodirov"},{c:"UZB5",n:"Eldor Shomurodov"},{c:"UZB6",n:"Abbosbek Fayzullayev"},
     {c:"UZB7",  n:"Jaloliddin Masharipov"},{c:"UZB8",n:"Dostonbek Khamdamov"},{c:"UZB9",n:"Otabek Shukurov"},
@@ -617,7 +647,7 @@ const ALBUM = [
     {c:"UZB16", n:"Bunyodбек Suyunov"},{c:"UZB17",n:"Oybek Khodjayev"},{c:"UZB18",n:"Bekzod Boyqobolov"},
     {c:"UZB19", n:"Mansur Juraboev"},{c:"UZB20",n:"Khojiakbar Alijonov"},
   ]},
-  {id:"COL", name:"Colombia",         flag:"🇨🇴", grupo:"Grupo K", stickers:[
+  {id:"COL", name:"Colombia",         flag:"https://flagcdn.com/24x18/co.png", grupo:"Grupo K", stickers:[
     {c:"COL1",  n:"Escudo"},{c:"COL2",n:"Camilo Vargas"},{c:"COL3",n:"David Ospina"},
     {c:"COL4",  n:"Davinson Sánchez"},{c:"COL5",n:"Yerry Mina"},{c:"COL6",n:"Daniel Muñoz"},
     {c:"COL7",  n:"Johan Mojica"},{c:"COL8",n:"Jhon Lucumí"},{c:"COL9",n:"Jefferson Lerma"},
@@ -626,7 +656,7 @@ const ALBUM = [
     {c:"COL16", n:"Jhon Arias"},{c:"COL17",n:"Jhon Córdoba"},{c:"COL18",n:"Luis J. Suárez"},
     {c:"COL19", n:"Luis Díaz"},{c:"COL20",n:"Santiago Arias"},
   ]},
-  {id:"COD", name:"R.D. Congo",       flag:"🇨🇩", grupo:"Grupo K", stickers:[
+  {id:"COD", name:"R.D. Congo",       flag:"https://flagcdn.com/24x18/cd.png", grupo:"Grupo K", stickers:[
     {c:"COD1",  n:"Escudo"},{c:"COD2",n:"Joël Kiassumbua"},{c:"COD3",n:"Marcel Tisserand"},
     {c:"COD4",  n:"Djo Kamara"},{c:"COD5",n:"Issama Mpeko"},{c:"COD6",n:"Chancel Mbemba"},
     {c:"COD7",  n:"Yannick Bolasie"},{c:"COD8",n:"Samuel Moutoussamy"},{c:"COD9",n:"Cédric Bakambu"},
@@ -637,7 +667,7 @@ const ALBUM = [
   ]},
 
   // ── GRUPO L ──
-  {id:"ENG", name:"Inglaterra",       flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", grupo:"Grupo L", stickers:[
+  {id:"ENG", name:"Inglaterra",       flag:"https://flagcdn.com/24x18/gb-eng.png", grupo:"Grupo L", stickers:[
     {c:"ENG1",  n:"Escudo"},{c:"ENG2",n:"Jordan Pickford"},{c:"ENG3",n:"Harry Maguire"},
     {c:"ENG4",  n:"John Stones"},{c:"ENG5",n:"Kyle Walker"},{c:"ENG6",n:"Luke Shaw"},
     {c:"ENG7",  n:"Declan Rice"},{c:"ENG8",n:"Jude Bellingham"},{c:"ENG9",n:"Phil Foden"},
@@ -646,7 +676,7 @@ const ALBUM = [
     {c:"ENG16", n:"Mason Mount"},{c:"ENG17",n:"Ollie Watkins"},{c:"ENG18",n:"Cole Palmer"},
     {c:"ENG19", n:"Kobbie Mainoo"},{c:"ENG20",n:"Levi Colwill"},
   ]},
-  {id:"CRO", name:"Croacia",          flag:"🇭🇷", grupo:"Grupo L", stickers:[
+  {id:"CRO", name:"Croacia",          flag:"https://flagcdn.com/24x18/hr.png", grupo:"Grupo L", stickers:[
     {c:"CRO1",  n:"Escudo"},{c:"CRO2",n:"Dominik Livaković"},{c:"CRO3",n:"Dejan Lovren"},
     {c:"CRO4",  n:"Joško Gvardiol"},{c:"CRO5",n:"Josip Juranović"},{c:"CRO6",n:"Borna Sosa"},
     {c:"CRO7",  n:"Mateo Kovačić"},{c:"CRO8",n:"Luka Modrić"},{c:"CRO9",n:"Marcelo Brozović"},
@@ -655,7 +685,7 @@ const ALBUM = [
     {c:"CRO16", n:"Martin Baturina"},{c:"CRO17",n:"Lovro Majer"},{c:"CRO18",n:"Dario Šimić"},
     {c:"CRO19", n:"Antonio Šutalo"},{c:"CRO20",n:"Petar Sučić"},
   ]},
-  {id:"GHA", name:"Ghana",            flag:"🇬🇭", grupo:"Grupo L", stickers:[
+  {id:"GHA", name:"Ghana",            flag:"https://flagcdn.com/24x18/gh.png", grupo:"Grupo L", stickers:[
     {c:"GHA1",  n:"Escudo"},{c:"GHA2",n:"Lawrence Ati Zigi"},{c:"GHA3",n:"Daniel Amartey"},
     {c:"GHA4",  n:"Alexander Djiku"},{c:"GHA5",n:"Tariq Lamptey"},{c:"GHA6",n:"Abdul Rahman Baba"},
     {c:"GHA7",  n:"Thomas Partey"},{c:"GHA8",n:"André Ayew"},{c:"GHA9",n:"Jordan Ayew"},
@@ -664,7 +694,7 @@ const ALBUM = [
     {c:"GHA16", n:"Ernest Nuamah"},{c:"GHA17",n:"Kamaldeen Sulemana"},{c:"GHA18",n:"Joel Fameyeh"},
     {c:"GHA19", n:"Salis Abdul Samed"},{c:"GHA20",n:"Daniel Afriyie Barnieh"},
   ]},
-  {id:"PAN", name:"Panamá",           flag:"🇵🇦", grupo:"Grupo L", stickers:[
+  {id:"PAN", name:"Panamá",           flag:"https://flagcdn.com/24x18/pa.png", grupo:"Grupo L", stickers:[
     {c:"PAN1",  n:"Escudo"},{c:"PAN2",n:"Luis Mejía"},{c:"PAN3",n:"Eric Davis"},
     {c:"PAN4",  n:"Fidel Escobar"},{c:"PAN5",n:"Harold Cummings"},{c:"PAN6",n:"Édgar Bárcenas"},
     {c:"PAN7",  n:"Adalberto Carrasquilla"},{c:"PAN8",n:"Anibal Godoy"},{c:"PAN9",n:"Rolando Blackburn"},
@@ -832,18 +862,80 @@ function filtrar() {
 
 // ─────────── EXPORTAR ───────────
 function exportar() {
-  let lines=['LÁMINAS FALTANTES — PANINI MUNDIAL 2026','Usuario: '+usuario,'Fecha: '+new Date().toLocaleDateString('es-CO'),''];
-  let hay=false;
-  ALBUM.forEach(sel=>{
-    const f=[];
-    sel.stickers.forEach((stk,i)=>{ if(getSt(sel.id,i)===0) f.push(stk.c+' ('+stk.n+')'); });
-    if(f.length>0 && f.length<sel.stickers.length){ hay=true; lines.push('\n'+sel.flag+' '+sel.name+' ('+sel.grupo+')'); f.forEach(x=>lines.push('  • '+x)); }
+  // Collect all missing stickers across entire album
+  const rows = [];
+  let totalFaltantes = 0;
+
+  ALBUM.forEach(sel => {
+    sel.stickers.forEach((stk, i) => {
+      const st = getSt(sel.id, i);
+      if (st === 0) {
+        rows.push({
+          'Grupo': sel.grupo,
+          'Selección': sel.name,
+          'Código': stk.c,
+          'Jugador / Lámina': stk.n,
+          'Estado': 'Falta'
+        });
+        totalFaltantes++;
+      } else if (st === 2) {
+        rows.push({
+          'Grupo': sel.grupo,
+          'Selección': sel.name,
+          'Código': stk.c,
+          'Jugador / Lámina': stk.n,
+          'Estado': 'Repetida'
+        });
+      }
+    });
   });
-  if(!hay){toast('Aún no has marcado ninguna lámina');return;}
-  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='faltantes_'+usuario+'_panini2026.txt'; a.click();
-  toast('Lista exportada ✓');
+
+  if (totalFaltantes === 0) { toast('Aún no has marcado ninguna lámina'); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // ── Hoja 1: Faltantes ──
+  const faltantes = rows.filter(r => r['Estado'] === 'Falta');
+  const wsFalt = XLSX.utils.json_to_sheet(faltantes);
+  // Column widths
+  wsFalt['!cols'] = [{wch:14},{wch:22},{wch:9},{wch:30},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, wsFalt, 'Faltantes');
+
+  // ── Hoja 2: Repetidas ──
+  const repetidas = rows.filter(r => r['Estado'] === 'Repetida');
+  if (repetidas.length > 0) {
+    const wsRep = XLSX.utils.json_to_sheet(repetidas);
+    wsRep['!cols'] = [{wch:14},{wch:22},{wch:9},{wch:30},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, wsRep, 'Repetidas');
+  }
+
+  // ── Hoja 3: Resumen por selección ──
+  const resumen = ALBUM.map(sel => {
+    const total = sel.stickers.length;
+    let tengo = 0, faltan = 0, repetidas = 0;
+    sel.stickers.forEach((_, i) => {
+      const st = getSt(sel.id, i);
+      if (st === 1) tengo++;
+      else if (st === 2) { tengo++; repetidas++; }
+      else faltan++;
+    });
+    return {
+      'Grupo': sel.grupo,
+      'Selección': sel.name,
+      'Total': total,
+      'Tengo': tengo,
+      'Faltan': faltan,
+      'Repetidas': repetidas,
+      '% Completado': Math.round(tengo / total * 100) + '%'
+    };
+  });
+  const wsRes = XLSX.utils.json_to_sheet(resumen);
+  wsRes['!cols'] = [{wch:14},{wch:22},{wch:7},{wch:7},{wch:7},{wch:10},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen');
+
+  const fecha = new Date().toLocaleDateString('es-CO').replace(/\//g,'-');
+  XLSX.writeFile(wb, `panini2026_${usuario}_${fecha}.xlsx`);
+  toast(`Excel exportado: ${totalFaltantes} faltantes ✓`);
 }
 
 function toast(msg) {
@@ -863,7 +955,7 @@ function buildUI() {
       const t=getTengo(sel),n=sel.stickers.length,pct=Math.round(t/n*100);
       html+=`<div class="sel-card${t===n?' done':''}" data-id="${sel.id}">
         <div class="sel-head" onclick="toggleCard('${sel.id}')">
-          <span class="flag">${sel.flag}</span>
+          ${sel.flag.startsWith("http") ? `<img src="${sel.flag}" class="flag-img" alt="${sel.name}">` : `<span class="flag">${sel.flag}</span>`}
           <div class="sel-info">
             <div class="sel-name">${sel.name}</div>
             <div class="sel-sub">${t}/${n}${t===n?' ✓':''}</div>
