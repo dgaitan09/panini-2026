@@ -171,8 +171,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </svg>
     </div>
     <h1>FIFA World Cup 2026</h1>
-    <p>Ingresa tu nombre o apodo para acceder a tu progreso</p>
+    <p>Ingresa tu nombre y clave. Si es tu primera vez, se creará tu cuenta automáticamente.</p>
     <input id="inp-nombre" type="text" placeholder="Tu nombre o apodo" maxlength="30" autocomplete="off">
+    <input id="inp-clave" type="password" placeholder="Tu clave secreta" maxlength="30" autocomplete="off" style="margin-top:0">
+    <div id="login-error" style="font-size:12px;color:#D85A30;margin:-4px 0 8px;display:none">Nombre o clave incorrectos</div>
     <button class="btn-primary" id="btn-entrar" disabled onclick="entrar()">Entrar al álbum</button>
     <div class="usuarios-list" id="usuarios-list" style="display:none">
       <p>Accesos recientes:</p>
@@ -810,10 +812,15 @@ function getUsuarios() {
 const inp = document.getElementById('inp-nombre');
 const btnE = document.getElementById('btn-entrar');
 
-inp.addEventListener('input', ()=>{
-  btnE.disabled = inp.value.trim().length < 2;
-});
-inp.addEventListener('keydown', e=>{ if(e.key==='Enter' && !btnE.disabled) entrar(); });
+const inpClave = document.getElementById('inp-clave');
+
+function checkForm() {
+  btnE.disabled = inp.value.trim().length < 2 || inpClave.value.trim().length < 2;
+}
+inp.addEventListener('input', checkForm);
+inpClave.addEventListener('input', checkForm);
+inp.addEventListener('keydown', e=>{ if(e.key==='Enter') inpClave.focus(); });
+inpClave.addEventListener('keydown', e=>{ if(e.key==='Enter' && !btnE.disabled) entrar(); });
 
 function mostrarUsuarios() {
   const us = getUsuarios();
@@ -828,34 +835,62 @@ function elegirUsuario(u) { inp.value=u; btnE.disabled=false; entrar(); }
 
 async function entrar() {
   const nombre = inp.value.trim();
-  if(nombre.length<2) return;
-  usuario = nombre;
+  const clave = inpClave.value.trim();
+  if(nombre.length<2 || clave.length<2) return;
+
   btnE.disabled = true;
-  btnE.textContent = 'Cargando...';
-  // Upsert usuario in Supabase
+  btnE.textContent = 'Verificando...';
+  document.getElementById('login-error').style.display = 'none';
+
   try {
-    await sbFetch('/rest/v1/usuarios', {
-      method: 'POST',
-      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-      body: JSON.stringify({ id: usuario, nombre: usuario, actualizado_en: new Date().toISOString() })
-    });
-  } catch(e) {}
-  await loadState();
-  document.getElementById('screen-login').style.display='none';
-  document.getElementById('screen-app').style.display='block';
-  document.getElementById('lbl-usuario').textContent = usuario;
+    // Check if user exists
+    const existing = await sbFetch(`/rest/v1/usuarios?id=eq.${encodeURIComponent(nombre)}&select=id,clave`);
+
+    if (Array.isArray(existing) && existing.length > 0) {
+      // User exists — verify password
+      if (existing[0].clave !== clave) {
+        document.getElementById('login-error').style.display = 'block';
+        btnE.disabled = false;
+        btnE.textContent = 'Entrar al álbum';
+        return;
+      }
+      // Password correct — update last seen
+      await sbFetch(`/rest/v1/usuarios?id=eq.${encodeURIComponent(nombre)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ actualizado_en: new Date().toISOString() })
+      });
+    } else {
+      // New user — register
+      await sbFetch('/rest/v1/usuarios', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ id: nombre, nombre: nombre, clave: clave, actualizado_en: new Date().toISOString() })
+      });
+    }
+
+    usuario = nombre;
+    await loadState();
+    document.getElementById('screen-login').style.display='none';
+    document.getElementById('screen-app').style.display='block';
+    document.getElementById('lbl-usuario').textContent = usuario;
+    buildUI();
+    loadRanking();
+
+  } catch(e) {
+    document.getElementById('login-error').textContent = 'Error de conexión, intenta de nuevo';
+    document.getElementById('login-error').style.display = 'block';
+  }
+
   btnE.disabled = false;
   btnE.textContent = 'Entrar al álbum';
-  buildUI();
-  // Show ranking tab if multiple users
-  loadRanking();
 }
 
 function salir() {
   usuario=null; state={}; openCards={};
   document.getElementById('screen-app').style.display='none';
   document.getElementById('screen-login').style.display='flex';
-  inp.value=''; btnE.disabled=true;
+  inp.value=''; inpClave.value=''; btnE.disabled=true;
+  document.getElementById('login-error').style.display='none';
   mostrarUsuarios();
 }
 
