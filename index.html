@@ -290,6 +290,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 // ─── SUPABASE CONFIG ───────────────────────────
 const SB_URL = "https://sjelrvfnfcdughkzyzsk.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqZWxydmZuZmNkdWdoa3p5enNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3Mjc1MTksImV4cCI6MjA5MzMwMzUxOX0.kCznv3yBaKPM_qFiwsjxiCPFAf9SfYb7sWrEMZVE8HA";
+const ANTHROPIC_KEY = "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";
 
 async function sbFetch(path, options={}) {
   const res = await fetch(SB_URL + path, {
@@ -1352,9 +1353,21 @@ Responde ÚNICAMENTE con un JSON con este formato exacto, sin texto adicional:
 Solo incluye los códigos de las láminas que puedas ver claramente en la foto. Si no puedes determinar el estado de alguna, no la incluyas en ninguna lista.`;
 
   try {
+    // Detect image type from base64
+    let mediaType = 'image/jpeg';
+    if(scanImageBase64.startsWith('/9j/')) mediaType = 'image/jpeg';
+    else if(scanImageBase64.startsWith('iVBOR')) mediaType = 'image/png';
+    else if(scanImageBase64.startsWith('R0lGO')) mediaType = 'image/gif';
+    else if(scanImageBase64.startsWith('UklGR')) mediaType = 'image/webp';
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1363,13 +1376,18 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
           content: [
             {
               type: 'image',
-              source: { type: 'base64', media_type: 'image/jpeg', data: scanImageBase64 }
+              source: { type: 'base64', media_type: mediaType, data: scanImageBase64 }
             },
             { type: 'text', text: prompt }
           ]
         }]
       })
     });
+
+    if(!response.ok) {
+      const errData = await response.json().catch(()=>({}));
+      throw new Error(errData.error?.message || 'Error ' + response.status);
+    }
 
     const data = await response.json();
     const text = data.content?.[0]?.text || '';
