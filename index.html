@@ -108,6 +108,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .filters{display:flex;gap:4px;flex-wrap:wrap}
 .fbtn{font-size:12px;padding:7px 11px;border:0.5px solid var(--brd2);border-radius:var(--rs);background:var(--card);color:var(--tx2);cursor:pointer;white-space:nowrap}
 .fbtn.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.btn-collapse{font-size:11px;padding:5px 10px;border:0.5px solid var(--brd2);border-radius:var(--rs);background:var(--card);color:var(--tx2);cursor:pointer;white-space:nowrap}
+.btn-collapse:hover{background:var(--bg)}
 
 .legend{display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap}
 .li{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--tx2)}
@@ -243,6 +245,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="fbtn" onclick="setF('repetidas',this)">Repetidas</button>
         <button class="fbtn" onclick="setF('completas',this)">Completas</button>
       </div>
+    <div style="display:flex;gap:4px">
+      <button class="btn-collapse" onclick="expandirTodo()">↕ Expandir</button>
+      <button class="btn-collapse" onclick="contraerTodo()">↕ Contraer</button>
+    </div>
     </div>
     <div class="legend">
       <div class="li"><div class="ld ldf"></div>Falta</div>
@@ -771,24 +777,6 @@ const ALBUM = [
     {c:"POR16", n:"Francisco Conceição"},{c:"POR17",n:"Diogo Jota"},{c:"POR18",n:"Matheus Nunes"},
     {c:"POR19", n:"João Félix"},{c:"POR20",n:"Rúben Neves"},
   ]},
-  {id:"UZB", name:"Uzbekistán",       flag:"https://flagcdn.com/24x18/uz.png", grupo:"Grupo K", stickers:[
-    {c:"UZB1",  n:"Escudo"},{c:"UZB2",n:"Utkir Yusupov"},{c:"UZB3",n:"Umid Hamrobekov"},
-    {c:"UZB4",  n:"Sherzod Qodirov"},{c:"UZB5",n:"Eldor Shomurodov"},{c:"UZB6",n:"Abbosbek Fayzullayev"},
-    {c:"UZB7",  n:"Jaloliddin Masharipov"},{c:"UZB8",n:"Dostonbek Khamdamov"},{c:"UZB9",n:"Otabek Shukurov"},
-    {c:"UZB10", n:"Jakhongir Sidiqov"},{c:"UZB11",n:"Husan Mahmudov"},{c:"UZB12",n:"Dilshod Tursunov"},
-    {c:"UZB13", n:"Foto grupal"},{c:"UZB14",n:"Jasur Yakhshiboev"},{c:"UZB15",n:"Alisher Dzhalilov"},
-    {c:"UZB16", n:"Bunyodбек Suyunov"},{c:"UZB17",n:"Oybek Khodjayev"},{c:"UZB18",n:"Bekzod Boyqobolov"},
-    {c:"UZB19", n:"Mansur Juraboev"},{c:"UZB20",n:"Khojiakbar Alijonov"},
-  ]},
-  {id:"COL", name:"Colombia",         flag:"https://flagcdn.com/24x18/co.png", grupo:"Grupo K", stickers:[
-    {c:"COL1",  n:"Escudo"},{c:"COL2",n:"Camilo Vargas"},{c:"COL3",n:"David Ospina"},
-    {c:"COL4",  n:"Davinson Sánchez"},{c:"COL5",n:"Yerry Mina"},{c:"COL6",n:"Daniel Muñoz"},
-    {c:"COL7",  n:"Johan Mojica"},{c:"COL8",n:"Jhon Lucumí"},{c:"COL9",n:"Jefferson Lerma"},
-    {c:"COL10", n:"Kevin Castaño"},{c:"COL11",n:"Richard Ríos"},{c:"COL12",n:"James Rodríguez"},
-    {c:"COL13", n:"Foto grupal"},{c:"COL14",n:"Juan F. Quintero"},{c:"COL15",n:"Jorge Carrascal"},
-    {c:"COL16", n:"Jhon Arias"},{c:"COL17",n:"Jhon Córdoba"},{c:"COL18",n:"Luis J. Suárez"},
-    {c:"COL19", n:"Luis Díaz"},{c:"COL20",n:"Santiago Arias"},
-  ]},
   {id:"COD", name:"R.D. Congo",       flag:"https://flagcdn.com/24x18/cd.png", grupo:"Grupo K", stickers:[
     {c:"COD1",  n:"Escudo"},{c:"COD2",n:"Joël Kiassumbua"},{c:"COD3",n:"Marcel Tisserand"},
     {c:"COD4",  n:"Djo Kamara"},{c:"COD5",n:"Issama Mpeko"},{c:"COD6",n:"Chancel Mbemba"},
@@ -1248,6 +1236,29 @@ async function descargarBackup() {
   btn.disabled = false;
 }
 
+// ─────────── EXPANDIR / CONTRAER ───────────
+function expandirTodo() {
+  ALBUM.forEach(sel => {
+    if(!openCards[sel.id]) {
+      openCards[sel.id] = true;
+      const panel = document.getElementById('p_'+sel.id);
+      const chev = document.getElementById('c_'+sel.id);
+      if(panel){ panel.classList.add('open'); renderStickers(sel.id); }
+      if(chev) chev.classList.add('open');
+    }
+  });
+}
+
+function contraerTodo() {
+  ALBUM.forEach(sel => {
+    openCards[sel.id] = false;
+    const panel = document.getElementById('p_'+sel.id);
+    const chev = document.getElementById('c_'+sel.id);
+    if(panel) panel.classList.remove('open');
+    if(chev) chev.classList.remove('open');
+  });
+}
+
 // ─────────── TAB NAVIGATION ───────────
 function showTab(tab) {
   document.getElementById('panel-ranking').style.display = 'none';
@@ -1507,6 +1518,25 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
               type: 'image',
               source: { type: 'base64', media_type: mediaType, data: scanImageBase64 }
             },
+  {id:"UZB", name:"Uzbekistán",       flag:"https://flagcdn.com/24x18/uz.png", grupo:"Grupo K", stickers:[
+    {c:"UZB1",  n:"Escudo"},{c:"UZB2",n:"Utkir Yusupov"},{c:"UZB3",n:"Umid Hamrobekov"},
+    {c:"UZB4",  n:"Sherzod Qodirov"},{c:"UZB5",n:"Eldor Shomurodov"},{c:"UZB6",n:"Abbosbek Fayzullayev"},
+    {c:"UZB7",  n:"Jaloliddin Masharipov"},{c:"UZB8",n:"Dostonbek Khamdamov"},{c:"UZB9",n:"Otabek Shukurov"},
+    {c:"UZB10", n:"Jakhongir Sidiqov"},{c:"UZB11",n:"Husan Mahmudov"},{c:"UZB12",n:"Dilshod Tursunov"},
+    {c:"UZB13", n:"Foto grupal"},{c:"UZB14",n:"Jasur Yakhshiboev"},{c:"UZB15",n:"Alisher Dzhalilov"},
+    {c:"UZB16", n:"Bunyodбек Suyunov"},{c:"UZB17",n:"Oybek Khodjayev"},{c:"UZB18",n:"Bekzod Boyqobolov"},
+    {c:"UZB19", n:"Mansur Juraboev"},{c:"UZB20",n:"Khojiakbar Alijonov"},
+  ]},
+  {id:"COL", name:"Colombia",         flag:"https://flagcdn.com/24x18/co.png", grupo:"Grupo K", stickers:[
+    {c:"COL1",  n:"Escudo"},{c:"COL2",n:"Camilo Vargas"},{c:"COL3",n:"David Ospina"},
+    {c:"COL4",  n:"Davinson Sánchez"},{c:"COL5",n:"Yerry Mina"},{c:"COL6",n:"Daniel Muñoz"},
+    {c:"COL7",  n:"Johan Mojica"},{c:"COL8",n:"Jhon Lucumí"},{c:"COL9",n:"Jefferson Lerma"},
+    {c:"COL10", n:"Kevin Castaño"},{c:"COL11",n:"Richard Ríos"},{c:"COL12",n:"James Rodríguez"},
+    {c:"COL13", n:"Foto grupal"},{c:"COL14",n:"Juan F. Quintero"},{c:"COL15",n:"Jorge Carrascal"},
+    {c:"COL16", n:"Jhon Arias"},{c:"COL17",n:"Jhon Córdoba"},{c:"COL18",n:"Luis J. Suárez"},
+    {c:"COL19", n:"Luis Díaz"},{c:"COL20",n:"Santiago Arias"},
+  ]},
+  
             { type: 'text', text: prompt }
           ]
         }]
