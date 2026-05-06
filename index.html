@@ -1016,20 +1016,20 @@ function renderStickers(id) {
   const grid=document.getElementById('sg_'+id); if(!grid) return;
   const sel=ALBUM.find(s=>s.id===id); if(!sel) return;
   grid.innerHTML='';
+  let count = 0;
   sel.stickers.forEach((stk,i)=>{
     const st=getSt(id,i);
-    // Filter stickers based on active filter
     if(filtroActual==='faltan' && st!==0) return;
     if(filtroActual==='repetidas' && st!==2) return;
+    count++;
     const d=document.createElement('div');
     d.className='stk'+(st===1?' t':st===2?' r':'');
-    d.innerHTML=`<div class="stk-num">${stk.c}</div><div class="stk-name">${stk.n}</div>`;
+    d.innerHTML='<div class="stk-num">'+stk.c+'</div><div class="stk-name">'+stk.n+'</div>';
     d.title=st===0?'Falta':st===1?'La tengo':'Repetida';
     d.onclick=(()=>{const idx=i;return()=>{setSt(id,idx);renderStickers(id);}})();
     grid.appendChild(d);
   });
-  // Show message if no stickers match filter
-  if(grid.children.length===0){
+  if(count===0){
     const msg=document.createElement('div');
     msg.style.cssText='font-size:12px;color:var(--tx3);padding:8px 0;grid-column:1/-1';
     msg.textContent=filtroActual==='faltan'?'✅ Tienes todas las láminas de este equipo':'Sin repetidas en este equipo';
@@ -1590,12 +1590,19 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
     if(marcadas>0) { saveState(); refreshStats(); refreshCard(sel.id); if(openCards[sel.id]) renderStickers(sel.id); }
 
     // Show results
-    resultDiv.innerHTML = `
-      <div class="found">✅ Se detectaron ${pegadas.length} láminas pegadas${marcadas>0?' · '+marcadas+' marcadas automáticamente':''}</div>
-      ${pegadas.length>0?`<div style="font-size:12px;color:var(--tx2);margin-top:4px">Pegadas:</div><div class="tags">${pegadas.map(c=>`<span class="stag">${c}</span>`).join('')}</div>`:''}
-      ${vacias.length>0?`<div style="font-size:12px;color:var(--tx2);margin-top:8px">Vacías detectadas (${vacias.length}):</div><div class="tags">${vacias.map(c=>`<span class="stag" style="background:var(--bg);border-color:var(--brd2);color:var(--tx3)">${c}</span>`).join('')}</div>`:''}
-      <div style="font-size:11px;color:var(--tx3);margin-top:10px">Revisa y ajusta manualmente si es necesario.</div>
-    `;
+    let scanHtml = '<div class="found">✅ Se detectaron ' + pegadas.length + ' láminas pegadas' + (marcadas>0?' · '+marcadas+' marcadas automáticamente':'') + '</div>';
+    if(pegadas.length>0) {
+      scanHtml += '<div style="font-size:12px;color:var(--tx2);margin-top:4px">Pegadas:</div><div class="tags">';
+      pegadas.forEach(c => { scanHtml += '<span class="stag">'+c+'</span>'; });
+      scanHtml += '</div>';
+    }
+    if(vacias.length>0) {
+      scanHtml += '<div style="font-size:12px;color:var(--tx2);margin-top:8px">Vacías detectadas ('+vacias.length+'):</div><div class="tags">';
+      vacias.forEach(c => { scanHtml += '<span class="stag" style="background:var(--bg);border-color:var(--brd2);color:var(--tx3)">'+c+'</span>'; });
+      scanHtml += '</div>';
+    }
+    scanHtml += '<div style="font-size:11px;color:var(--tx3);margin-top:10px">Revisa y ajusta manualmente si es necesario.</div>';
+    resultDiv.innerHTML = scanHtml;
 
   } catch(e) {
     resultDiv.innerHTML = `<div style="color:var(--rj)">Error al analizar: ${e.message}. Verifica tu conexión e intenta de nuevo.</div>`;
@@ -1686,12 +1693,19 @@ mostrarUsuarios();
     if(marcadas>0) { saveState(); refreshStats(); refreshCard(sel.id); if(openCards[sel.id]) renderStickers(sel.id); }
 
     // Show results
-    resultDiv.innerHTML = `
-      <div class="found">✅ Se detectaron ${pegadas.length} láminas pegadas${marcadas>0?' · '+marcadas+' marcadas automáticamente':''}</div>
-      ${pegadas.length>0?`<div style="font-size:12px;color:var(--tx2);margin-top:4px">Pegadas:</div><div class="tags">${pegadas.map(c=>`<span class="stag">${c}</span>`).join('')}</div>`:''}
-      ${vacias.length>0?`<div style="font-size:12px;color:var(--tx2);margin-top:8px">Vacías detectadas (${vacias.length}):</div><div class="tags">${vacias.map(c=>`<span class="stag" style="background:var(--bg);border-color:var(--brd2);color:var(--tx3)">${c}</span>`).join('')}</div>`:''}
-      <div style="font-size:11px;color:var(--tx3);margin-top:10px">Revisa y ajusta manualmente si es necesario.</div>
-    `;
+    let scanHtml = '<div class="found">✅ Se detectaron ' + pegadas.length + ' láminas pegadas' + (marcadas>0?' · '+marcadas+' marcadas automáticamente':'') + '</div>';
+    if(pegadas.length>0) {
+      scanHtml += '<div style="font-size:12px;color:var(--tx2);margin-top:4px">Pegadas:</div><div class="tags">';
+      pegadas.forEach(c => { scanHtml += '<span class="stag">'+c+'</span>'; });
+      scanHtml += '</div>';
+    }
+    if(vacias.length>0) {
+      scanHtml += '<div style="font-size:12px;color:var(--tx2);margin-top:8px">Vacías detectadas ('+vacias.length+'):</div><div class="tags">';
+      vacias.forEach(c => { scanHtml += '<span class="stag" style="background:var(--bg);border-color:var(--brd2);color:var(--tx3)">'+c+'</span>'; });
+      scanHtml += '</div>';
+    }
+    scanHtml += '<div style="font-size:11px;color:var(--tx3);margin-top:10px">Revisa y ajusta manualmente si es necesario.</div>';
+    resultDiv.innerHTML = scanHtml;
 
   } catch(e) {
     resultDiv.innerHTML = `<div style="color:var(--rj)">Error al analizar: ${e.message}. Verifica tu conexión e intenta de nuevo.</div>`;
