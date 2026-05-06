@@ -1169,8 +1169,18 @@ async function descargarBackup() {
   try {
     // Fetch all users
     const usuarios = await sbFetch('/rest/v1/usuarios?select=id,nombre,actualizado_en');
-    // Fetch all stickers
-    const laminas = await sbFetch('/rest/v1/laminas?select=usuario_id,lamina_id,estado');
+
+    // Fetch ALL stickers with pagination (Supabase limit is 1000 per request)
+    let laminas = [];
+    let offset = 0;
+    const pageSize = 1000;
+    while(true) {
+      const page = await sbFetch('/rest/v1/laminas?select=usuario_id,lamina_id,estado&limit=' + pageSize + '&offset=' + offset);
+      if(!Array.isArray(page) || page.length === 0) break;
+      laminas = laminas.concat(page);
+      if(page.length < pageSize) break;
+      offset += pageSize;
+    }
 
     if(!Array.isArray(usuarios) || !Array.isArray(laminas)) throw new Error('No se pudieron obtener los datos');
 
