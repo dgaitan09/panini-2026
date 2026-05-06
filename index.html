@@ -1161,12 +1161,12 @@ function toast(msg) {
 }
 
 // ─────────── BACKUP ADMIN ───────────
-async function descargarBackup() {{
+async function descargarBackup() {
   const btn = document.getElementById('btn-backup');
   btn.textContent = '⏳ Generando...';
   btn.disabled = true;
 
-  try {{
+  try {
     // Fetch all users
     const usuarios = await sbFetch('/rest/v1/usuarios?select=id,nombre,actualizado_en');
     // Fetch all stickers
@@ -1178,11 +1178,11 @@ async function descargarBackup() {{
 
     // ── Hoja 1: Resumen por usuario ──
     const totalAlbum = ALBUM.reduce((a,s)=>a+s.stickers.length,0);
-    const resumen = usuarios.map(u => {{
+    const resumen = usuarios.map(u => {
       const uLam = laminas.filter(l=>l.usuario_id===u.id);
       const tengo = uLam.filter(l=>l.estado>=1).length;
       const rep = uLam.filter(l=>l.estado===2).length;
-      return {{
+      return {
         'Usuario': u.nombre,
         'Total láminas': totalAlbum,
         'Tengo': tengo,
@@ -1190,36 +1190,36 @@ async function descargarBackup() {{
         'Repetidas': rep,
         '% Completado': Math.round(tengo/totalAlbum*100) + '%',
         'Última actividad': new Date(u.actualizado_en).toLocaleDateString('es-CO')
-      }};
-    }}).sort((a,b)=>b['Tengo']-a['Tengo']);
+      };
+    }).sort((a,b)=>b['Tengo']-a['Tengo']);
 
     const wsRes = XLSX.utils.json_to_sheet(resumen);
-    wsRes['!cols'] = [{{wch:16}},{{wch:14}},{{wch:8}},{{wch:8}},{{wch:10}},{{wch:14}},{{wch:18}}];
+    wsRes['!cols'] = [{wch:16},{wch:14},{wch:8},{wch:8},{wch:10},{wch:14},{wch:18}];
     XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen usuarios');
 
     // ── Hoja 2: Progreso detallado por usuario ──
     const detalle = [];
-    usuarios.forEach(u => {{
-      ALBUM.forEach(sel => {{
-        sel.stickers.forEach((stk, i) => {{
+    usuarios.forEach(u => {
+      ALBUM.forEach(sel => {
+        sel.stickers.forEach((stk, i) => {
           const lam = laminas.find(l=>l.usuario_id===u.id && l.lamina_id===sel.id+'_'+i);
           const estado = lam ? lam.estado : 0;
-          if(estado > 0) {{
-            detalle.push({{
+          if(estado > 0) {
+            detalle.push({
               'Usuario': u.nombre,
               'Grupo': sel.grupo,
               'Selección': sel.name,
               'Código': stk.c,
               'Jugador': stk.n,
               'Estado': estado===1 ? 'Tengo' : 'Repetida'
-            }});
-          }}
-        }});
-      }});
-    }});
+            });
+          }
+        });
+      });
+    });
 
     const wsDet = XLSX.utils.json_to_sheet(detalle);
-    wsDet['!cols'] = [{{wch:16}},{{wch:14}},{{wch:20}},{{wch:9}},{{wch:28}},{{wch:10}}];
+    wsDet['!cols'] = [{wch:16},{wch:14},{wch:20},{wch:9},{wch:28},{wch:10}];
     XLSX.utils.book_append_sheet(wb, wsDet, 'Detalle láminas');
 
     // ── Hoja 3: Datos crudos ──
@@ -1227,16 +1227,16 @@ async function descargarBackup() {{
     XLSX.utils.book_append_sheet(wb, wsRaw, 'Datos crudos');
 
     const fecha = new Date().toLocaleDateString('es-CO').replace(/\//g,'-');
-    XLSX.writeFile(wb, `backup_panini2026_${{fecha}}.xlsx`);
+    XLSX.writeFile(wb, `backup_panini2026_${fecha}.xlsx`);
     toast('Backup descargado ✓');
 
-  }} catch(e) {{
+  } catch(e) {
     toast('Error al generar backup: ' + e.message);
-  }}
+  }
 
   btn.textContent = '💾 Backup';
   btn.disabled = false;
-}}
+}
 
 // ─────────── TAB NAVIGATION ───────────
 function showTab(tab) {
