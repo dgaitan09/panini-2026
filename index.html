@@ -115,7 +115,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .li{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--tx2)}
 .ld{width:13px;height:13px;border-radius:3px;border:0.5px solid}
 .ldf{background:var(--bg);border-color:var(--brd2)}
-.ldt{background:#c8f0e0;border-color:#1a7a58}
+.ldt{background:#97C459;border-color:#3B6D11}
 .ldr{background:var(--azb);border-color:var(--azbr)}
 
 .sec{margin-bottom:10px}
@@ -145,9 +145,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stk:active{transform:scale(.92)}
 .stk-num{font-size:11px;font-weight:700;color:var(--tx2)}
 .stk-name{font-size:9px;color:var(--tx3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stk.t{background:#c8f0e0;border-color:#1a7a58}
-.stk.t .stk-num{color:#0a4a35}
-.stk.t .stk-name{color:#1a7a58}
+.stk.t{background:#97C459;border-color:#3B6D11}
+.stk.t .stk-num{color:#173404}
+.stk.t .stk-name{color:#173404}
 .stk.r{background:var(--azb);border-color:var(--azbr)}
 .stk.r .stk-num{color:#185FA5}
 .stk.r .stk-name{color:#378ADD}
@@ -1348,17 +1348,17 @@ async function loadRanking() {
     const medals = ['🥇','🥈','🥉'];
     const medalClass = ['gold','silver','bronze'];
 
-    cont.innerHTML = rankData.map((r,i)=>`
-      <div class="ranking-card${r.nombre===usuario?' done':''}">
-        <div class="rank-pos ${i<3?medalClass[i]:''}">${i<3?medals[i]:'#'+(i+1)}</div>
-        <div class="rank-info">
-          <div class="rank-name">${r.nombre}${r.nombre===usuario?' (tú)':''}</div>
-          <div class="rank-sub">${r.tengo} láminas · ${r.faltan} faltantes · ${r.rep} repetidas</div>
-          <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:${r.pct}%"></div></div>
-        </div>
-        <div class="rank-pct">${r.pct}%</div>
-      </div>
-    `).join('');
+    cont.innerHTML = rankData.map((r,i)=>{
+      return '<div class="ranking-card'+(r.nombre===usuario?' done':'')+'">'
+        +'<div class="rank-pos '+(i<3?medalClass[i]:'')+'">'+(i<3?medals[i]:'#'+(i+1))+'</div>'
+        +'<div class="rank-info">'
+        +'<div class="rank-name">'+r.nombre+(r.nombre===usuario?' (tú)':'')+'</div>'
+        +'<div class="rank-sub">'+r.tengo+' láminas · '+r.faltan+' faltantes · '+r.rep+' repetidas</div>'
+        +'<div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:'+r.pct+'%"></div></div>'
+        +'</div>'
+        +'<div class="rank-pct">'+r.pct+'%</div>'
+        +'</div>';
+    }).join('');
   } catch(e) {
     cont.innerHTML = '<div class="empty-panel"><div class="big">⚠️</div>No se pudo cargar el ranking.</div>';
   }
@@ -1398,17 +1398,15 @@ async function loadCambios() {
       // Find which of my repetidas they might need
       const misRep = Object.keys(state).filter(k=>state[k]===2);
 
-      html += `<div class="cambio-card">
-        <div class="cambio-header">
-          <div>
-            <div class="cambio-name">👤 ${uNombre}</div>
-            <div class="cambio-sub">${repIds.length} repetidas disponibles${yoNecesito.length>0?' · <b style="color:var(--v)">'+yoNecesito.length+' te interesan</b>':''}</div>
-          </div>
-        </div>`;
+      html += '<div class="cambio-card">'
+        +'<div class="cambio-header"><div>'
+        +'<div class="cambio-name">👤 '+uNombre+'</div>'
+        +'<div class="cambio-sub">'+repIds.length+' repetidas disponibles'+(yoNecesito.length>0?' · <b style="color:var(--v)">'+yoNecesito.length+' te interesan</b>':'')+'</div>'
+        +'</div></div>';
 
       if(yoNecesito.length > 0){
-        html += `<div style="font-size:12px;color:var(--tx2);margin-bottom:5px">Repetidas de ${uNombre} que te faltan:</div>
-        <div class="cambio-tags">`;
+        html += '<div style="font-size:12px;color:var(--tx2);margin-bottom:5px">Repetidas de '+uNombre+' que te faltan:</div>'
+          +'<div class="cambio-tags">';
         yoNecesito.slice(0,20).forEach(lid=>{
           const parts = lid.split('_');
           const selId = parts[0];
@@ -1429,14 +1427,12 @@ async function loadCambios() {
     const misRepIds = Object.keys(state).filter(k=>state[k]===2);
     let propioHtml = '';
     if(misRepIds.length>0){
-      propioHtml = `<div class="cambio-card" style="border-color:var(--vbr)">
-        <div class="cambio-header">
-          <div>
-            <div class="cambio-name">⭐ Mis repetidas (${misRepIds.length})</div>
-            <div class="cambio-sub">Estas son tus láminas disponibles para cambiar</div>
-          </div>
-        </div>
-        <div class="cambio-tags">`;
+      propioHtml = '<div class="cambio-card" style="border-color:var(--vbr)">'
+        +'<div class="cambio-header"><div>'
+        +'<div class="cambio-name">⭐ Mis repetidas ('+misRepIds.length+')</div>'
+        +'<div class="cambio-sub">Estas son tus láminas disponibles para cambiar</div>'
+        +'</div></div>'
+        +'<div class="cambio-tags">';
       misRepIds.slice(0,30).forEach(lid=>{
         const parts=lid.split('_'); const selId=parts[0]; const idx=parseInt(parts[1]);
         const sel=ALBUM.find(s=>s.id===selId); const stk=sel?.stickers[idx];
@@ -1509,23 +1505,18 @@ async function analizarFoto() {
     btn.disabled=false; btn.textContent='🤖 Analizar con IA'; return;
   }
 
-  // Build sticker list for this team
-  const stickerList = sel.stickers.map((s,i)=>`${s.c}: ${s.n}`).join('\n');
-
-  const prompt = `Eres un asistente que analiza fotos de álbumes de figuritas Panini del Mundial FIFA 2026.
-
-Estoy mirando la página de ${sel.name} en el álbum. Las láminas posibles son:
-${stickerList}
-
-Analiza esta foto del álbum y determina cuáles láminas YA ESTÁN PEGADAS (se ven completas, con imagen de jugador o escudo) y cuáles están VACÍAS (solo se ve el espacio en blanco o el número sin lámina).
-
-Responde ÚNICAMENTE con un JSON con este formato exacto, sin texto adicional:
-\{"pegadas": ["MEX1", "MEX3", "MEX7"], "vacias": ["MEX2", "MEX4", "MEX5", "MEX6"]\}
-
-Solo incluye los códigos de las láminas que puedas ver claramente en la foto. Si no puedes determinar el estado de alguna, no la incluyas en ninguna lista.`;
+  const stickerList = sel.stickers.map(function(s){return s.c+': '+s.n;}).join('\n');
+  const promptText = 'Eres un asistente que analiza fotos de álbumes de figuritas Panini del Mundial FIFA 2026.\n\n'
+    + 'Estoy mirando la página de '+sel.name+' en el álbum. Las láminas posibles son:\n'
+    + stickerList + '\n\n'
+    + 'Analiza esta foto del álbum y determina cuáles láminas YA ESTÁN PEGADAS (se ven completas, con imagen de jugador o escudo) '
+    + 'y cuáles están VACÍAS (solo se ve el espacio en blanco o el número sin lámina).\n\n'
+    + 'Responde ÚNICAMENTE con un JSON con este formato exacto, sin texto adicional:\n'
+    + '{"pegadas": ["MEX1", "MEX3", "MEX7"], "vacias": ["MEX2", "MEX4", "MEX5", "MEX6"]}\n\n'
+    + 'Solo incluye los códigos de las láminas que puedas ver claramente en la foto. '
+    + 'Si no puedes determinar el estado de alguna, no la incluyas en ninguna lista.';
 
   try {
-    // Detect image type from base64
     let mediaType = 'image/jpeg';
     if(scanImageBase64.startsWith('/9j/')) mediaType = 'image/jpeg';
     else if(scanImageBase64.startsWith('iVBOR')) mediaType = 'image/png';
@@ -1546,25 +1537,21 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
         messages: [{
           role: 'user',
           content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: mediaType, data: scanImageBase64 }
-            },
-            { type: 'text', text: prompt }
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: scanImageBase64 } },
+            { type: 'text', text: promptText }
           ]
         }]
       })
     });
 
     if(!response.ok) {
-      const errData = await response.json().catch(()=>({}));
-      throw new Error(errData.error?.message || 'Error ' + response.status);
+      const errData = await response.json().catch(function(){return {};});
+      throw new Error(errData.error ? errData.error.message : 'Error ' + response.status);
     }
 
     const data = await response.json();
-    const text = data.content?.[0]?.text || '';
+    const text = data.content && data.content[0] ? data.content[0].text : '';
 
-    // Parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if(!jsonMatch) throw new Error('No se pudo interpretar la respuesta');
 
@@ -1574,13 +1561,12 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
 
     if(pegadas.length === 0 && vacias.length === 0) {
       resultDiv.innerHTML = '<div style="color:var(--rj)">No se pudieron detectar láminas. Intenta con una foto más clara y bien iluminada.</div>';
-      return;
+      btn.disabled=false; btn.textContent='🤖 Analizar con IA'; return;
     }
 
-    // Mark stickers automatically
     let marcadas = 0;
-    pegadas.forEach(codigo => {
-      const idx = sel.stickers.findIndex(s=>s.c===codigo);
+    pegadas.forEach(function(codigo) {
+      const idx = sel.stickers.findIndex(function(s){return s.c===codigo;});
       if(idx>=0 && getSt(sel.id,idx)===0) {
         state[sel.id+'_'+idx] = 1;
         scheduleSyncToSupabase(sel.id+'_'+idx, 1);
@@ -1589,16 +1575,15 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
     });
     if(marcadas>0) { saveState(); refreshStats(); refreshCard(sel.id); if(openCards[sel.id]) renderStickers(sel.id); }
 
-    // Show results
     let scanHtml = '<div class="found">✅ Se detectaron ' + pegadas.length + ' láminas pegadas' + (marcadas>0?' · '+marcadas+' marcadas automáticamente':'') + '</div>';
     if(pegadas.length>0) {
       scanHtml += '<div style="font-size:12px;color:var(--tx2);margin-top:4px">Pegadas:</div><div class="tags">';
-      pegadas.forEach(c => { scanHtml += '<span class="stag">'+c+'</span>'; });
+      pegadas.forEach(function(c){ scanHtml += '<span class="stag">'+c+'</span>'; });
       scanHtml += '</div>';
     }
     if(vacias.length>0) {
       scanHtml += '<div style="font-size:12px;color:var(--tx2);margin-top:8px">Vacías detectadas ('+vacias.length+'):</div><div class="tags">';
-      vacias.forEach(c => { scanHtml += '<span class="stag" style="background:var(--bg);border-color:var(--brd2);color:var(--tx3)">'+c+'</span>'; });
+      vacias.forEach(function(c){ scanHtml += '<span class="stag" style="background:var(--bg);border-color:var(--brd2);color:var(--tx3)">'+c+'</span>'; });
       scanHtml += '</div>';
     }
     scanHtml += '<div style="font-size:11px;color:var(--tx3);margin-top:10px">Revisa y ajusta manualmente si es necesario.</div>';
@@ -1612,34 +1597,39 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
   btn.textContent = '🤖 Analizar con IA';
 }
 
+
 // ─────────── BUILD UI ───────────
 function buildUI() {
   const grupos={};
-  ALBUM.forEach(sel=>{ if(!grupos[sel.grupo]) grupos[sel.grupo]=[]; grupos[sel.grupo].push(sel); });
+  ALBUM.forEach(function(sel){ if(!grupos[sel.grupo]) grupos[sel.grupo]=[]; grupos[sel.grupo].push(sel); });
   let html='';
   for(const grupo in grupos){
-    html+=`<div class="sec"><div class="sec-title">${grupo}</div>`;
-    grupos[grupo].forEach(sel=>{
+    html+='<div class="sec"><div class="sec-title">'+grupo+'</div>';
+    grupos[grupo].forEach(function(sel){
       const t=getTengo(sel),n=sel.stickers.length,pct=Math.round(t/n*100);
-      html+=`<div class="sel-card${t===n?' done':''}" data-id="${sel.id}">
-        <div class="sel-head" onclick="toggleCard('${sel.id}')">
-          ${sel.flag.startsWith("http") ? `<img src="${sel.flag}" class="flag-img" alt="${sel.name}">` : `<span class="flag">${sel.flag}</span>`}
-          <div class="sel-info">
-            <div class="sel-name">${sel.name}</div>
-            <div class="sel-sub">${t}/${n}${t===n?' ✓':''}</div>
-          </div>
-          <span class="sel-pct">${pct>0?pct+'%':''}</span>
-          <span class="chev" id="c_${sel.id}">▼</span>
-        </div>
-        <div class="minibar"><div class="minifill" style="width:${pct}%"></div></div>
-        <div class="panel" id="p_${sel.id}">
-          <div class="panel-actions">
-            <button class="sbtn" onclick="marcarTodas('${sel.id}',event)">Marcar / desmarcar todas</button>
-            <button class="btn-scan" onclick="event.stopPropagation();openScanModal('${sel.id}')">📸 Escanear página</button>
-          </div>
-          <div class="sgrid" id="sg_${sel.id}"></div>
-        </div>
-      </div>`;
+      const flagHtml = sel.flag.startsWith('http')
+        ? '<img src="'+sel.flag+'" class="flag-img" alt="'+sel.name+'">'
+        : '<span class="flag">'+sel.flag+'</span>';
+      const sid = sel.id;
+      html+='<div class="sel-card'+(t===n?' done':'')+'" data-id="'+sid+'">'
+        +'<div class="sel-head" onclick="toggleCard(&quot;'+sid+'&quot;)">'
+        +flagHtml
+        +'<div class="sel-info">'
+        +'<div class="sel-name">'+sel.name+'</div>'
+        +'<div class="sel-sub">'+t+'/'+n+(t===n?' ✓':'')+'</div>'
+        +'</div>'
+        +'<span class="sel-pct">'+(pct>0?pct+'%':'')+'</span>'
+        +'<span class="chev" id="c_'+sid+'">▼</span>'
+        +'</div>'
+        +'<div class="minibar"><div class="minifill" style="width:'+pct+'%"></div></div>'
+        +'<div class="panel" id="p_'+sid+'">'
+        +'<div class="panel-actions">'
+        +'<button class="sbtn" onclick="marcarTodas(&quot;'+sid+'&quot;,event)">Marcar / desmarcar todas</button>'
+        +'<button class="btn-scan" onclick="event.stopPropagation();openScanModal(&quot;'+sid+'&quot;)">📸 Escanear página</button>'
+        +'</div>'
+        +'<div class="sgrid" id="sg_'+sid+'"></div>'
+        +'</div>'
+        +'</div>';
     });
     html+='</div>';
   }
@@ -1726,7 +1716,7 @@ function buildUI() {
       const t=getTengo(sel),n=sel.stickers.length,pct=Math.round(t/n*100);
       html+=`<div class="sel-card${t===n?' done':''}" data-id="${sel.id}">
         <div class="sel-head" onclick="toggleCard('${sel.id}')">
-          ${sel.flag.startsWith("http") ? `<img src="${sel.flag}" class="flag-img" alt="${sel.name}">` : `<span class="flag">${sel.flag}</span>`}
+          '+(sel.flag.startsWith('http') ? '<img src="'+sel.flag+'" class="flag-img" alt="'+sel.name+'">' : '<span class="flag">'+sel.flag+'</span>')+'
           <div class="sel-info">
             <div class="sel-name">${sel.name}</div>
             <div class="sel-sub">${t}/${n}${t===n?' ✓':''}</div>
