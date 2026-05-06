@@ -1282,8 +1282,9 @@ async function loadRanking() {
 
     // Fetch progress per user using aggregation
     const rankData = await Promise.all(usuarios.map(async u => {
-      const tengoRows = await sbFetch(`/rest/v1/laminas?usuario_id=eq.${encodeURIComponent(u.id)}&estado=gte.1&select=lamina_id`, {headers:{'Prefer':'count=exact'}});
-      const repRows = await sbFetch(`/rest/v1/laminas?usuario_id=eq.${encodeURIComponent(u.id)}&estado=eq.2&select=lamina_id`);
+      const uid = encodeURIComponent(u.id);
+      const tengoRows = await sbFetch('/rest/v1/laminas?usuario_id=eq.'+uid+'&estado=gte.1&select=lamina_id');
+      const repRows = await sbFetch('/rest/v1/laminas?usuario_id=eq.'+uid+'&estado=eq.2&select=lamina_id');
       const tengo = Array.isArray(tengoRows) ? tengoRows.length : 0;
       const rep = Array.isArray(repRows) ? repRows.length : 0;
       const pct = Math.round(tengo/totalAlbum*100);
