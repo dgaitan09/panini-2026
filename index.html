@@ -854,7 +854,7 @@ function storageKey() { return 'panini2026_' + usuario; }
 async function loadState() {
   // Always load from Supabase
   try {
-    const rows = await sbFetch(`/rest/v1/laminas?usuario_id=eq.${encodeURIComponent(usuario)}&select=lamina_id,estado`);
+    const rows = await sbFetch('/rest/v1/laminas?usuario_id=eq.'+encodeURIComponent(usuario)+'&select=lamina_id,estado');
     state = {};
     if (Array.isArray(rows)) rows.forEach(r => { state[r.lamina_id] = r.estado; });
   } catch(e) {
@@ -906,7 +906,7 @@ function mostrarUsuarios() {
   const ch = document.getElementById('chips');
   if(us.length===0){ul.style.display='none';return;}
   ul.style.display='block';
-  ch.innerHTML = us.map(u=>`<span class="usuario-chip" onclick="elegirUsuario('${u}')">${u}</span>`).join('');
+  ch.innerHTML = us.map(function(u){ return '<span class="usuario-chip" onclick="elegirUsuario(\'' + u + '\')">' + u + '</span>'; }).join('');
 }
 
 function elegirUsuario(u) { inp.value=u; btnE.disabled=false; entrar(); }
@@ -922,7 +922,7 @@ async function entrar() {
 
   try {
     // Check if user exists
-    const existing = await sbFetch(`/rest/v1/usuarios?id=eq.${encodeURIComponent(nombre)}&select=id,clave`);
+    const existing = await sbFetch('/rest/v1/usuarios?id=eq.'+encodeURIComponent(nombre)+'&select=id,clave');
 
     if (Array.isArray(existing) && existing.length > 0) {
       // User exists — verify password
@@ -933,7 +933,7 @@ async function entrar() {
         return;
       }
       // Password correct — update last seen
-      await sbFetch(`/rest/v1/usuarios?id=eq.${encodeURIComponent(nombre)}`, {
+      await sbFetch('/rest/v1/usuarios?id=eq.'+encodeURIComponent(nombre), {
         method: 'PATCH',
         body: JSON.stringify({ actualizado_en: new Date().toISOString() })
       });
@@ -1170,8 +1170,8 @@ function exportar() {
   XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen');
 
   const fecha = new Date().toLocaleDateString('es-CO').replace(/\//g,'-');
-  XLSX.writeFile(wb, `panini2026_${usuario}_${fecha}.xlsx`);
-  toast(`Excel exportado: ${totalFaltantes} faltantes ✓`);
+  XLSX.writeFile(wb, 'panini2026_'+usuario+'_'+fecha+'.xlsx');
+  toast('Excel exportado: '+totalFaltantes+' faltantes ✓');
 }
 
 function toast(msg) {
@@ -1257,7 +1257,7 @@ async function descargarBackup() {
     XLSX.utils.book_append_sheet(wb, wsRaw, 'Datos crudos');
 
     const fecha = new Date().toLocaleDateString('es-CO').replace(/\//g,'-');
-    XLSX.writeFile(wb, `backup_panini2026_${fecha}.xlsx`);
+    XLSX.writeFile(wb, 'backup_panini2026_'+fecha+'.xlsx');
     toast('Backup descargado ✓');
 
   } catch(e) {
@@ -1413,12 +1413,12 @@ async function loadCambios() {
           const idx = parseInt(parts[1]);
           const sel = ALBUM.find(s=>s.id===selId);
           const stk = sel?.stickers[idx];
-          html += `<span class="tag">${stk?stk.c:lid}</span>`;
+          html += '<span class="tag">'+(stk?stk.c:lid)+'</span>';
         });
-        if(yoNecesito.length>20) html+=`<span class="tag">+${yoNecesito.length-20} más</span>`;
+        if(yoNecesito.length>20) html+='<span class="tag">+'+( yoNecesito.length-20)+' más</span>';
         html += '</div>';
       } else {
-        html += `<div style="font-size:12px;color:var(--tx3)">Ninguna de sus repetidas te falta actualmente.</div>`;
+        html += '<div style="font-size:12px;color:var(--tx3)">Ninguna de sus repetidas te falta actualmente.</div>';
       }
       html += '</div>';
     }
@@ -1436,9 +1436,9 @@ async function loadCambios() {
       misRepIds.slice(0,30).forEach(lid=>{
         const parts=lid.split('_'); const selId=parts[0]; const idx=parseInt(parts[1]);
         const sel=ALBUM.find(s=>s.id===selId); const stk=sel?.stickers[idx];
-        propioHtml+=`<span class="tag" style="background:var(--vb);border-color:var(--vbr);color:var(--v)">${stk?stk.c:lid}</span>`;
+        propioHtml+='<span class="tag" style="background:var(--vb);border-color:var(--vbr);color:var(--v)">'+(stk?stk.c:lid)+'</span>';
       });
-      if(misRepIds.length>30) propioHtml+=`<span class="tag">+${misRepIds.length-30} más</span>`;
+      if(misRepIds.length>30) propioHtml+='<span class="tag">+'+(misRepIds.length-30)+' más</span>';
       propioHtml+='</div></div>';
     }
 
@@ -1457,7 +1457,7 @@ function openScanModal(selId) {
   scanImageBase64 = null;
   const sel = ALBUM.find(s=>s.id===selId);
   document.getElementById('scan-modal-sub').textContent =
-    `Toma una foto a la página de ${sel.name} en tu álbum y la IA detectará las láminas pegadas.`;
+    'Toma una foto a la página de '+sel.name+' en tu álbum y la IA detectará las láminas pegadas.';
   document.getElementById('scan-preview').style.display='none';
   document.getElementById('scan-preview').src='';
   document.getElementById('scan-result').style.display='none';
@@ -1706,39 +1706,6 @@ mostrarUsuarios();
 }
 
 // ─────────── BUILD UI ───────────
-function buildUI() {
-  const grupos={};
-  ALBUM.forEach(sel=>{ if(!grupos[sel.grupo]) grupos[sel.grupo]=[]; grupos[sel.grupo].push(sel); });
-  let html='';
-  for(const grupo in grupos){
-    html+=`<div class="sec"><div class="sec-title">${grupo}</div>`;
-    grupos[grupo].forEach(sel=>{
-      const t=getTengo(sel),n=sel.stickers.length,pct=Math.round(t/n*100);
-      html+=`<div class="sel-card${t===n?' done':''}" data-id="${sel.id}">
-        <div class="sel-head" onclick="toggleCard('${sel.id}')">
-          '+(sel.flag.startsWith('http') ? '<img src="'+sel.flag+'" class="flag-img" alt="'+sel.name+'">' : '<span class="flag">'+sel.flag+'</span>')+'
-          <div class="sel-info">
-            <div class="sel-name">${sel.name}</div>
-            <div class="sel-sub">${t}/${n}${t===n?' ✓':''}</div>
-          </div>
-          <span class="sel-pct">${pct>0?pct+'%':''}</span>
-          <span class="chev" id="c_${sel.id}">▼</span>
-        </div>
-        <div class="minibar"><div class="minifill" style="width:${pct}%"></div></div>
-        <div class="panel" id="p_${sel.id}">
-          <div class="panel-actions">
-            <button class="sbtn" onclick="marcarTodas('${sel.id}',event)">Marcar / desmarcar todas</button>
-            <button class="btn-scan" onclick="event.stopPropagation();openScanModal('${sel.id}')">📸 Escanear página</button>
-          </div>
-          <div class="sgrid" id="sg_${sel.id}"></div>
-        </div>
-      </div>`;
-    });
-    html+='</div>';
-  }
-  document.getElementById('contenedor').innerHTML=html;
-  refreshStats();
-}
 
 // Init
 mostrarUsuarios();
