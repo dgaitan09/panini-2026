@@ -115,7 +115,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .li{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--tx2)}
 .ld{width:13px;height:13px;border-radius:3px;border:0.5px solid}
 .ldf{background:var(--bg);border-color:var(--brd2)}
-.ldt{background:var(--vb);border-color:var(--vbr)}
+.ldt{background:#c8f0e0;border-color:#1a7a58}
 .ldr{background:var(--azb);border-color:var(--azbr)}
 
 .sec{margin-bottom:10px}
@@ -145,9 +145,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stk:active{transform:scale(.92)}
 .stk-num{font-size:11px;font-weight:700;color:var(--tx2)}
 .stk-name{font-size:9px;color:var(--tx3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stk.t{background:var(--vb);border-color:var(--vbr)}
-.stk.t .stk-num{color:#0F6E56}
-.stk.t .stk-name{color:#1D9E75}
+.stk.t{background:#c8f0e0;border-color:#1a7a58}
+.stk.t .stk-num{color:#0a4a35}
+.stk.t .stk-name{color:#1a7a58}
 .stk.r{background:var(--azb);border-color:var(--azbr)}
 .stk.r .stk-num{color:#185FA5}
 .stk.r .stk-name{color:#378ADD}
@@ -1018,13 +1018,23 @@ function renderStickers(id) {
   grid.innerHTML='';
   sel.stickers.forEach((stk,i)=>{
     const st=getSt(id,i);
+    // Filter stickers based on active filter
+    if(filtroActual==='faltan' && st!==0) return;
+    if(filtroActual==='repetidas' && st!==2) return;
     const d=document.createElement('div');
     d.className='stk'+(st===1?' t':st===2?' r':'');
     d.innerHTML=`<div class="stk-num">${stk.c}</div><div class="stk-name">${stk.n}</div>`;
     d.title=st===0?'Falta':st===1?'La tengo':'Repetida';
-    d.onclick=(()=>{const idx=i;return()=>setSt(id,idx);})();
+    d.onclick=(()=>{const idx=i;return()=>{setSt(id,idx);renderStickers(id);}})();
     grid.appendChild(d);
   });
+  // Show message if no stickers match filter
+  if(grid.children.length===0){
+    const msg=document.createElement('div');
+    msg.style.cssText='font-size:12px;color:var(--tx3);padding:8px 0;grid-column:1/-1';
+    msg.textContent=filtroActual==='faltan'?'✅ Tienes todas las láminas de este equipo':'Sin repetidas en este equipo';
+    grid.appendChild(msg);
+  }
 }
 
 function toggleCard(id) {
@@ -1057,6 +1067,10 @@ function setF(f,btn) {
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   filtrar();
+  // Re-render all open sticker grids to apply filter
+  Object.keys(openCards).forEach(id=>{
+    if(openCards[id]) renderStickers(id);
+  });
 }
 function filtrar() {
   const q=document.getElementById('search').value.toLowerCase();
