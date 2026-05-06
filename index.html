@@ -786,6 +786,24 @@ const ALBUM = [
     {c:"COD16", n:"Théo Bongonda"},{c:"COD17",n:"Arthur Masuaku"},{c:"COD18",n:"Gaël Kakuta"},
     {c:"COD19", n:"Fiston Mayele"},{c:"COD20",n:"Dominique Badji"},
   ]},
+  {id:"UZB", name:"Uzbekistán",       flag:"https://flagcdn.com/24x18/uz.png", grupo:"Grupo K", stickers:[
+    {c:"UZB1",  n:"Escudo"},{c:"UZB2",n:"Utkir Yusupov"},{c:"UZB3",n:"Umid Hamrobekov"},
+    {c:"UZB4",  n:"Sherzod Qodirov"},{c:"UZB5",n:"Eldor Shomurodov"},{c:"UZB6",n:"Abbosbek Fayzullayev"},
+    {c:"UZB7",  n:"Jaloliddin Masharipov"},{c:"UZB8",n:"Dostonbek Khamdamov"},{c:"UZB9",n:"Otabek Shukurov"},
+    {c:"UZB10", n:"Jakhongir Sidiqov"},{c:"UZB11",n:"Husan Mahmudov"},{c:"UZB12",n:"Dilshod Tursunov"},
+    {c:"UZB13", n:"Foto grupal"},{c:"UZB14",n:"Jasur Yakhshiboev"},{c:"UZB15",n:"Alisher Dzhalilov"},
+    {c:"UZB16", n:"Bunyodбек Suyunov"},{c:"UZB17",n:"Oybek Khodjayev"},{c:"UZB18",n:"Bekzod Boyqobolov"},
+    {c:"UZB19", n:"Mansur Juraboev"},{c:"UZB20",n:"Khojiakbar Alijonov"},
+  ]},
+  {id:"COL", name:"Colombia",         flag:"https://flagcdn.com/24x18/co.png", grupo:"Grupo K", stickers:[
+    {c:"COL1",  n:"Escudo"},{c:"COL2",n:"Camilo Vargas"},{c:"COL3",n:"David Ospina"},
+    {c:"COL4",  n:"Davinson Sánchez"},{c:"COL5",n:"Yerry Mina"},{c:"COL6",n:"Daniel Muñoz"},
+    {c:"COL7",  n:"Johan Mojica"},{c:"COL8",n:"Jhon Lucumí"},{c:"COL9",n:"Jefferson Lerma"},
+    {c:"COL10", n:"Kevin Castaño"},{c:"COL11",n:"Richard Ríos"},{c:"COL12",n:"James Rodríguez"},
+    {c:"COL13", n:"Foto grupal"},{c:"COL14",n:"Juan F. Quintero"},{c:"COL15",n:"Jorge Carrascal"},
+    {c:"COL16", n:"Jhon Arias"},{c:"COL17",n:"Jhon Córdoba"},{c:"COL18",n:"Luis J. Suárez"},
+    {c:"COL19", n:"Luis Díaz"},{c:"COL20",n:"Santiago Arias"},
+  ]},
 
   // ── GRUPO L ──
   {id:"ENG", name:"Inglaterra",       flag:"https://flagcdn.com/24x18/gb-eng.png", grupo:"Grupo L", stickers:[
@@ -1518,24 +1536,101 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
               type: 'image',
               source: { type: 'base64', media_type: mediaType, data: scanImageBase64 }
             },
-  {id:"UZB", name:"Uzbekistán",       flag:"https://flagcdn.com/24x18/uz.png", grupo:"Grupo K", stickers:[
-    {c:"UZB1",  n:"Escudo"},{c:"UZB2",n:"Utkir Yusupov"},{c:"UZB3",n:"Umid Hamrobekov"},
-    {c:"UZB4",  n:"Sherzod Qodirov"},{c:"UZB5",n:"Eldor Shomurodov"},{c:"UZB6",n:"Abbosbek Fayzullayev"},
-    {c:"UZB7",  n:"Jaloliddin Masharipov"},{c:"UZB8",n:"Dostonbek Khamdamov"},{c:"UZB9",n:"Otabek Shukurov"},
-    {c:"UZB10", n:"Jakhongir Sidiqov"},{c:"UZB11",n:"Husan Mahmudov"},{c:"UZB12",n:"Dilshod Tursunov"},
-    {c:"UZB13", n:"Foto grupal"},{c:"UZB14",n:"Jasur Yakhshiboev"},{c:"UZB15",n:"Alisher Dzhalilov"},
-    {c:"UZB16", n:"Bunyodбек Suyunov"},{c:"UZB17",n:"Oybek Khodjayev"},{c:"UZB18",n:"Bekzod Boyqobolov"},
-    {c:"UZB19", n:"Mansur Juraboev"},{c:"UZB20",n:"Khojiakbar Alijonov"},
-  ]},
-  {id:"COL", name:"Colombia",         flag:"https://flagcdn.com/24x18/co.png", grupo:"Grupo K", stickers:[
-    {c:"COL1",  n:"Escudo"},{c:"COL2",n:"Camilo Vargas"},{c:"COL3",n:"David Ospina"},
-    {c:"COL4",  n:"Davinson Sánchez"},{c:"COL5",n:"Yerry Mina"},{c:"COL6",n:"Daniel Muñoz"},
-    {c:"COL7",  n:"Johan Mojica"},{c:"COL8",n:"Jhon Lucumí"},{c:"COL9",n:"Jefferson Lerma"},
-    {c:"COL10", n:"Kevin Castaño"},{c:"COL11",n:"Richard Ríos"},{c:"COL12",n:"James Rodríguez"},
-    {c:"COL13", n:"Foto grupal"},{c:"COL14",n:"Juan F. Quintero"},{c:"COL15",n:"Jorge Carrascal"},
-    {c:"COL16", n:"Jhon Arias"},{c:"COL17",n:"Jhon Córdoba"},{c:"COL18",n:"Luis J. Suárez"},
-    {c:"COL19", n:"Luis Díaz"},{c:"COL20",n:"Santiago Arias"},
-  ]},
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    if(!response.ok) {
+      const errData = await response.json().catch(()=>({}));
+      throw new Error(errData.error?.message || 'Error ' + response.status);
+    }
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+
+    // Parse JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No se pudo interpretar la respuesta');
+
+    const resultado = JSON.parse(jsonMatch[0]);
+    const pegadas = resultado.pegadas || [];
+    const vacias = resultado.vacias || [];
+
+    if(pegadas.length === 0 && vacias.length === 0) {
+      resultDiv.innerHTML = '<div style="color:var(--rj)">No se pudieron detectar láminas. Intenta con una foto más clara y bien iluminada.</div>';
+      return;
+    }
+
+    // Mark stickers automatically
+    let marcadas = 0;
+    pegadas.forEach(codigo => {
+      const idx = sel.stickers.findIndex(s=>s.c===codigo);
+      if(idx>=0 && getSt(sel.id,idx)===0) {
+        state[sel.id+'_'+idx] = 1;
+        scheduleSyncToSupabase(sel.id+'_'+idx, 1);
+        marcadas++;
+      }
+    });
+    if(marcadas>0) { saveState(); refreshStats(); refreshCard(sel.id); if(openCards[sel.id]) renderStickers(sel.id); }
+
+    // Show results
+    resultDiv.innerHTML = `
+      <div class="found">✅ Se detectaron ${pegadas.length} láminas pegadas${marcadas>0?' · '+marcadas+' marcadas automáticamente':''}</div>
+      ${pegadas.length>0?`<div style="font-size:12px;color:var(--tx2);margin-top:4px">Pegadas:</div><div class="tags">${pegadas.map(c=>`<span class="stag">${c}</span>`).join('')}</div>`:''}
+      ${vacias.length>0?`<div style="font-size:12px;color:var(--tx2);margin-top:8px">Vacías detectadas (${vacias.length}):</div><div class="tags">${vacias.map(c=>`<span class="stag" style="background:var(--bg);border-color:var(--brd2);color:var(--tx3)">${c}</span>`).join('')}</div>`:''}
+      <div style="font-size:11px;color:var(--tx3);margin-top:10px">Revisa y ajusta manualmente si es necesario.</div>
+    `;
+
+  } catch(e) {
+    resultDiv.innerHTML = `<div style="color:var(--rj)">Error al analizar: ${e.message}. Verifica tu conexión e intenta de nuevo.</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🤖 Analizar con IA';
+}
+
+// ─────────── BUILD UI ───────────
+function buildUI() {
+  const grupos={};
+  ALBUM.forEach(sel=>{ if(!grupos[sel.grupo]) grupos[sel.grupo]=[]; grupos[sel.grupo].push(sel); });
+  let html='';
+  for(const grupo in grupos){
+    html+=`<div class="sec"><div class="sec-title">${grupo}</div>`;
+    grupos[grupo].forEach(sel=>{
+      const t=getTengo(sel),n=sel.stickers.length,pct=Math.round(t/n*100);
+      html+=`<div class="sel-card${t===n?' done':''}" data-id="${sel.id}">
+        <div class="sel-head" onclick="toggleCard('${sel.id}')">
+          ${sel.flag.startsWith("http") ? `<img src="${sel.flag}" class="flag-img" alt="${sel.name}">` : `<span class="flag">${sel.flag}</span>`}
+          <div class="sel-info">
+            <div class="sel-name">${sel.name}</div>
+            <div class="sel-sub">${t}/${n}${t===n?' ✓':''}</div>
+          </div>
+          <span class="sel-pct">${pct>0?pct+'%':''}</span>
+          <span class="chev" id="c_${sel.id}">▼</span>
+        </div>
+        <div class="minibar"><div class="minifill" style="width:${pct}%"></div></div>
+        <div class="panel" id="p_${sel.id}">
+          <div class="panel-actions">
+            <button class="sbtn" onclick="marcarTodas('${sel.id}',event)">Marcar / desmarcar todas</button>
+            <button class="btn-scan" onclick="event.stopPropagation();openScanModal('${sel.id}')">📸 Escanear página</button>
+          </div>
+          <div class="sgrid" id="sg_${sel.id}"></div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('contenedor').innerHTML=html;
+  refreshStats();
+}
+
+// Init
+mostrarUsuarios();
+</script>
+</body>
+</html>
   
             { type: 'text', text: prompt }
           ]
