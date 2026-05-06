@@ -38,10 +38,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar-inner{max-width:700px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .topbar-left h1{font-size:16px;font-weight:600}
 .topbar-left p{font-size:12px;color:var(--tx2)}
-.btn-salir{font-size:12px;padding:6px 10px;border:0.5px solid var(--brd2);border-radius:var(--rs);background:transparent;color:var(--tx2);cursor:pointer}
-.btn-salir:hover{background:var(--bg)}
-.btn-tab{font-size:12px;padding:6px 11px;border:0.5px solid var(--brd2);border-radius:var(--rs);background:transparent;color:var(--tx2);cursor:pointer;white-space:nowrap}
-.btn-tab:hover{background:var(--bg)}
+.btn-salir{font-size:12px;padding:6px 10px;border:0.5px solid rgba(255,255,255,0.2);border-radius:var(--rs);background:rgba(255,255,255,0.07);color:#ccc;cursor:pointer;transition:all .15s}
+.btn-salir:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4);color:#fff}
+.btn-tab{font-size:12px;padding:6px 11px;border:0.5px solid rgba(255,255,255,0.2);border-radius:var(--rs);background:rgba(255,255,255,0.07);color:#ccc;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn-tab:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4);color:#fff}
 .ranking-card{background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 .rank-pos{font-size:22px;font-weight:800;width:36px;text-align:center;flex-shrink:0}
 .rank-pos.gold{color:#FFD700}.rank-pos.silver{color:#C0C0C0}.rank-pos.bronze{color:#CD7F32}
@@ -101,10 +101,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .search-wrap input:focus{border-color:var(--v)}
 .ico-search{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:13px;pointer-events:none}
 .filters{display:flex;gap:4px;flex-wrap:wrap}
-.fbtn{font-size:12px;padding:7px 11px;border:0.5px solid var(--brd2);border-radius:var(--rs);background:var(--card);color:var(--tx2);cursor:pointer;white-space:nowrap}
-.fbtn.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
-.btn-collapse{font-size:11px;padding:5px 10px;border:0.5px solid var(--brd2);border-radius:var(--rs);background:var(--card);color:var(--tx2);cursor:pointer;white-space:nowrap}
-.btn-collapse:hover{background:var(--bg)}
+.fbtn{font-size:12px;padding:7px 11px;border:0.5px solid rgba(255,255,255,0.2);border-radius:var(--rs);background:rgba(255,255,255,0.07);color:#ccc;cursor:pointer;white-space:nowrap;transition:all .15s}
+.fbtn:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4);color:#fff}
+.fbtn.on{background:rgba(255,255,255,0.9);color:#111;border-color:rgba(255,255,255,0.9)}
+.fbtn.on:hover{background:#fff;color:#111}
+.btn-collapse{font-size:11px;padding:5px 10px;border:0.5px solid rgba(255,255,255,0.2);border-radius:var(--rs);background:rgba(255,255,255,0.07);color:#ccc;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn-collapse:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4);color:#fff}
 
 .legend{display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap}
 .li{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--tx2)}
@@ -1295,14 +1297,12 @@ function showTab(tab) {
   document.getElementById('panel-ranking').style.display = 'none';
   document.getElementById('panel-cambios').style.display = 'none';
   document.getElementById('panel-album').style.display = 'none';
-  document.getElementById('fab-export').style.display = 'none';
   document.querySelectorAll('.btn-tab').forEach(b => {
     b.style.fontWeight=''; b.style.borderColor='';
   });
 
   if(tab === 'album') {
     document.getElementById('panel-album').style.display = 'block';
-    document.getElementById('fab-export').style.display = 'flex';
     document.getElementById('tab-album').style.fontWeight='600';
     document.getElementById('tab-album').style.borderColor='var(--tx)';
   } else if(tab === 'ranking') {
@@ -1605,10 +1605,13 @@ function scrollToTop() {
 window.addEventListener('scroll', function() {
   const btn = document.getElementById('fab-top');
   if(btn) {
-    if(window.scrollY > 300) btn.classList.add('visible');
-    else btn.classList.remove('visible');
+    if(window.scrollY > 200 || document.documentElement.scrollTop > 200) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
   }
-});
+}, {passive: true});
 
 // ─────────── BUILD UI ───────────
 function buildUI() {
