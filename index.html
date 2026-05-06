@@ -65,6 +65,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .section-title{font-size:16px;font-weight:700;margin:16px 0 10px}
 .empty-panel{text-align:center;padding:48px 20px;color:var(--tx3)}
 .empty-panel .big{font-size:40px;margin-bottom:12px}
+.btn-backup{font-size:12px;padding:6px 12px;border:0.5px solid #DAA520;border-radius:var(--rs);background:#FFF8DC;color:#8B6914;cursor:pointer;display:none}
+.btn-backup:hover{background:#FFD700;color:#5a3e00}
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--brd2);border-top-color:var(--v);border-radius:50%;animation:spin .7s linear infinite;margin:24px auto;display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
 .btn-scan{font-size:11px;padding:4px 9px;border-radius:6px;border:0.5px solid var(--az);background:var(--azb);color:var(--az);cursor:pointer;display:flex;align-items:center;gap:4px}
@@ -213,6 +215,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn-tab" id="tab-album" onclick="showTab('album')" style="font-weight:600;border-color:var(--tx)">Mi Álbum</button>
         <button class="btn-tab" id="tab-ranking" onclick="showTab('ranking')">🏆 Ranking</button>
         <button class="btn-tab" id="tab-cambios" onclick="showTab('cambios')">🔄 Cambios</button>
+        <button class="btn-backup" id="btn-backup" onclick="descargarBackup()">💾 Backup</button>
         <button class="btn-salir" onclick="salir()">Salir</button>
       </div>
     </div>
@@ -942,6 +945,7 @@ async function entrar() {
     document.getElementById('screen-login').style.display='none';
     document.getElementById('screen-app').style.display='block';
     document.getElementById('lbl-usuario').textContent = usuario;
+    document.getElementById('btn-backup').style.display = usuario === 'dgaitanc' ? 'block' : 'none';
     buildUI();
     loadRanking();
 
@@ -1156,6 +1160,84 @@ function toast(msg) {
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+// ─────────── BACKUP ADMIN ───────────
+async function descargarBackup() {{
+  const btn = document.getElementById('btn-backup');
+  btn.textContent = '⏳ Generando...';
+  btn.disabled = true;
+
+  try {{
+    // Fetch all users
+    const usuarios = await sbFetch('/rest/v1/usuarios?select=id,nombre,actualizado_en');
+    // Fetch all stickers
+    const laminas = await sbFetch('/rest/v1/laminas?select=usuario_id,lamina_id,estado');
+
+    if(!Array.isArray(usuarios) || !Array.isArray(laminas)) throw new Error('No se pudieron obtener los datos');
+
+    const wb = XLSX.utils.book_new();
+
+    // ── Hoja 1: Resumen por usuario ──
+    const totalAlbum = ALBUM.reduce((a,s)=>a+s.stickers.length,0);
+    const resumen = usuarios.map(u => {{
+      const uLam = laminas.filter(l=>l.usuario_id===u.id);
+      const tengo = uLam.filter(l=>l.estado>=1).length;
+      const rep = uLam.filter(l=>l.estado===2).length;
+      return {{
+        'Usuario': u.nombre,
+        'Total láminas': totalAlbum,
+        'Tengo': tengo,
+        'Faltan': totalAlbum - tengo,
+        'Repetidas': rep,
+        '% Completado': Math.round(tengo/totalAlbum*100) + '%',
+        'Última actividad': new Date(u.actualizado_en).toLocaleDateString('es-CO')
+      }};
+    }}).sort((a,b)=>b['Tengo']-a['Tengo']);
+
+    const wsRes = XLSX.utils.json_to_sheet(resumen);
+    wsRes['!cols'] = [{{wch:16}},{{wch:14}},{{wch:8}},{{wch:8}},{{wch:10}},{{wch:14}},{{wch:18}}];
+    XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen usuarios');
+
+    // ── Hoja 2: Progreso detallado por usuario ──
+    const detalle = [];
+    usuarios.forEach(u => {{
+      ALBUM.forEach(sel => {{
+        sel.stickers.forEach((stk, i) => {{
+          const lam = laminas.find(l=>l.usuario_id===u.id && l.lamina_id===sel.id+'_'+i);
+          const estado = lam ? lam.estado : 0;
+          if(estado > 0) {{
+            detalle.push({{
+              'Usuario': u.nombre,
+              'Grupo': sel.grupo,
+              'Selección': sel.name,
+              'Código': stk.c,
+              'Jugador': stk.n,
+              'Estado': estado===1 ? 'Tengo' : 'Repetida'
+            }});
+          }}
+        }});
+      }});
+    }});
+
+    const wsDet = XLSX.utils.json_to_sheet(detalle);
+    wsDet['!cols'] = [{{wch:16}},{{wch:14}},{{wch:20}},{{wch:9}},{{wch:28}},{{wch:10}}];
+    XLSX.utils.book_append_sheet(wb, wsDet, 'Detalle láminas');
+
+    // ── Hoja 3: Datos crudos ──
+    const wsRaw = XLSX.utils.json_to_sheet(laminas);
+    XLSX.utils.book_append_sheet(wb, wsRaw, 'Datos crudos');
+
+    const fecha = new Date().toLocaleDateString('es-CO').replace(/\//g,'-');
+    XLSX.writeFile(wb, `backup_panini2026_${{fecha}}.xlsx`);
+    toast('Backup descargado ✓');
+
+  }} catch(e) {{
+    toast('Error al generar backup: ' + e.message);
+  }}
+
+  btn.textContent = '💾 Backup';
+  btn.disabled = false;
+}}
+
 // ─────────── TAB NAVIGATION ───────────
 function showTab(tab) {
   document.getElementById('panel-ranking').style.display = 'none';
@@ -1195,17 +1277,19 @@ async function loadRanking() {
       cont.innerHTML = '<div class="empty-panel"><div class="big">🏆</div>Aún no hay otros usuarios registrados.</div>';
       return;
     }
-    // Get all stickers
-    const laminas = await sbFetch('/rest/v1/laminas?select=usuario_id,estado');
-    const totalAlbum = ALBUM.reduce((a,s)=>a+s.stickers.length,0);
+    // Get all stickers - increase limit and get count per user directly
+    const totalAlbum = ALBUM.filter(s=>s.id!=='CC').reduce((a,s)=>a+s.stickers.length,0);
 
-    const rankData = usuarios.map(u => {
-      const uLaminas = Array.isArray(laminas) ? laminas.filter(l=>l.usuario_id===u.id) : [];
-      const tengo = uLaminas.filter(l=>l.estado>=1).length;
-      const rep = uLaminas.filter(l=>l.estado===2).length;
+    // Fetch progress per user using aggregation
+    const rankData = await Promise.all(usuarios.map(async u => {
+      const tengoRows = await sbFetch(`/rest/v1/laminas?usuario_id=eq.${encodeURIComponent(u.id)}&estado=gte.1&select=lamina_id`, {headers:{'Prefer':'count=exact'}});
+      const repRows = await sbFetch(`/rest/v1/laminas?usuario_id=eq.${encodeURIComponent(u.id)}&estado=eq.2&select=lamina_id`);
+      const tengo = Array.isArray(tengoRows) ? tengoRows.length : 0;
+      const rep = Array.isArray(repRows) ? repRows.length : 0;
       const pct = Math.round(tengo/totalAlbum*100);
       return { nombre: u.nombre, tengo, rep, pct, faltan: totalAlbum - tengo };
-    }).sort((a,b)=>b.tengo-a.tengo);
+    }));
+    rankData.sort((a,b)=>b.tengo-a.tengo);
 
     const medals = ['🥇','🥈','🥉'];
     const medalClass = ['gold','silver','bronze'];
