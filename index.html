@@ -1605,7 +1605,7 @@ Solo incluye los códigos de las láminas que puedas ver claramente en la foto. 
     resultDiv.innerHTML = scanHtml;
 
   } catch(e) {
-    resultDiv.innerHTML = `<div style="color:var(--rj)">Error al analizar: ${e.message}. Verifica tu conexión e intenta de nuevo.</div>`;
+    resultDiv.innerHTML = '<div style="color:var(--rj)">Error al analizar: ' + e.message + '. Verifica tu conexión e intenta de nuevo.</div>';
   }
 
   btn.disabled = false;
@@ -1708,7 +1708,7 @@ mostrarUsuarios();
     resultDiv.innerHTML = scanHtml;
 
   } catch(e) {
-    resultDiv.innerHTML = `<div style="color:var(--rj)">Error al analizar: ${e.message}. Verifica tu conexión e intenta de nuevo.</div>`;
+    resultDiv.innerHTML = '<div style="color:var(--rj)">Error al analizar: ' + e.message + '. Verifica tu conexión e intenta de nuevo.</div>';
   }
 
   btn.disabled = false;
